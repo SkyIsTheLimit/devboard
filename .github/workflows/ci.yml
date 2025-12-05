@@ -36,6 +36,9 @@ jobs:
       - name: Type check UI library
         run: npm run type-check --workspace=packages/ui
 
+      - name: Build UI library
+        run: npm run build --workspace=packages/ui
+
       - name: Type check Web app
         run: npm run type-check --workspace=packages/web
 
