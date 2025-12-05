@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: "20"
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   lint-and-typecheck:
@@ -30,8 +31,6 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
         working-directory: packages/web
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Type check UI library
         run: npm run type-check --workspace=packages/ui
@@ -69,16 +68,12 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
         working-directory: packages/web
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Build UI library
         run: npm run build --workspace=packages/ui
 
       - name: Build Web app
         run: npm run build --workspace=packages/web
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
   test:
     name: Test
