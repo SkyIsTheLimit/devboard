@@ -1,13 +1,15 @@
 import { Status, Task as TaskModel } from "@/types";
 import { Button } from "@devboard-interactive/ui";
 
-const statusColors: Record<Status, "default" | "info" | "warning" | "success"> =
-  {
-    TODO: "default",
-    IN_PROGRESS: "info",
-    IN_REVIEW: "warning",
-    DONE: "success",
-  };
+export const statusColors: Record<
+  Status,
+  "default" | "info" | "warning" | "success"
+> = {
+  TODO: "default",
+  IN_PROGRESS: "info",
+  IN_REVIEW: "warning",
+  DONE: "success",
+};
 
 export const statusLabels: Record<Status, string> = {
   TODO: "To Do",

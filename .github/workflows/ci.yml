@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        working-directory: packages/web
+
+      - name: Type check UI library
+        run: npm run type-check --workspace=packages/ui
+
+      - name: Build UI library
+        run: npm run build --workspace=packages/ui
+
+      - name: Type check Web app
+        run: npm run type-check --workspace=packages/web
+
+      - name: Lint UI library
+        run: npm run lint --workspace=packages/ui --if-present
+
+      - name: Lint Web app
+        run: npm run lint --workspace=packages/web
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        working-directory: packages/web
+
+      - name: Build UI library
+        run: npm run build --workspace=packages/ui
+
+      - name: Build Web app
+        run: npm run build --workspace=packages/web
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        working-directory: packages/web
+
+      # Placeholder for tests - we'll add real tests later
+      - name: Run tests
+        run: echo "No tests configured yet - add tests to fail this check"
