@@ -1,0 +1,15 @@
+{
+    "name": "devboard",
+    "version": "0.0.0",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "npm run dev --workspace=packages/web",
+        "build": "npm run build --workspaces",
+        "lint": "npm run lint --workspaces --if-present",
+        "test": "npm run test --workspaces --if-present",
+        "type-check": "npm run type-check --workspaces --if-present"
+    }
+}
