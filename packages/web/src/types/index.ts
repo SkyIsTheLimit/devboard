@@ -1,5 +1,3 @@
-import { TaskModel } from "@/generated/prisma/models";
-
 export type Status = "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
 export type Priority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
