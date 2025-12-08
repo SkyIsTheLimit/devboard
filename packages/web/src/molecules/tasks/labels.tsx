@@ -5,12 +5,12 @@ export type SelectableLabel = Label & { selected: boolean };
 
 export type TaskLabelsProps =
   | {
-      mode: "selectable";
+      mode?: "selectable";
       labels: SelectableLabel[];
       onToggle?: (label: SelectableLabel) => void;
     }
   | {
-      mode: "normal";
+      mode?: "normal";
       labels: Label[];
       onToggle?: never;
     };
