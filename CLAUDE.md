@@ -55,24 +55,29 @@ npm run build --workspace=packages/ui
 
 ### Database Management (Prisma)
 
-The database is managed via Prisma in the `packages/web` directory.
+The database is managed via Prisma in the `packages/web` directory. You can run these commands from the root or from `packages/web/`:
 
 ```bash
-# Generate Prisma Client (after schema changes)
+# From packages/web directory:
 cd packages/web
+
+# Generate Prisma Client (after schema changes, also runs automatically on npm install)
 npx prisma generate
 
 # Run database migrations
-npx prisma migrate dev
+npm run db:migrate
+# or: npx prisma migrate dev
 
 # Reset database and re-seed
 npx prisma migrate reset
 
 # Open Prisma Studio (database GUI)
-npx prisma studio
+npm run db:studio
+# or: npx prisma studio
 
 # Run seed script
-npx tsx prisma/seed.ts
+npm run db:seed
+# or: npx tsx prisma/seed.ts
 ```
 
 ## Architecture
@@ -87,33 +92,45 @@ The `web` package depends on the local `ui` package via the workspace protocol:
 
 - **Schema location**: `packages/web/prisma/schema.prisma`
 - **Generated client**: Output to `packages/web/src/generated/prisma` (custom location)
-- **Database**: PostgreSQL
-- **Client singleton**: `packages/web/src/app/lib/prisma.ts` provides a singleton PrismaClient instance with hot-reload support in development
+- **Database**: PostgreSQL with `@prisma/adapter-pg` for connection pooling
+- **Client singleton**: `packages/web/src/lib/prisma.ts` provides a singleton PrismaClient instance with hot-reload support in development
 - **Data model**: Tasks with labels, using enums for Status and Priority
+- **Auto-generation**: Prisma Client regenerates automatically on `npm install` via postinstall hook
 
 Key models:
 - `Task`: Core task entity with title, description, status, priority, dueDate, and labels
 - `Label`: Reusable labels with name and color that can be attached to multiple tasks
+
+Enums:
+- `Status`: TODO, IN_PROGRESS, IN_REVIEW, DONE
+- `Priority`: LOW, MEDIUM, HIGH, URGENT
 
 ### UI Component Library (@devboard-interactive/ui)
 
 Built with:
 - **Bundler**: tsup (dual CJS/ESM output with TypeScript declarations)
 - **Styling**: Tailwind CSS utility classes (expects Tailwind in consuming app)
+- **Component Patterns**: Uses class-variance-authority (cva) for variant management
+- **Primitives**: Radix UI primitives for accessible components (Label, Select, Separator, Slot)
 - **React patterns**: forwardRef for all components, TypeScript interfaces extending native HTML attributes
 
 Components follow a consistent pattern:
 - Export both component and props interface
 - Support className prop for extension
-- Use variant/size prop patterns for visual variations
-- All components are in `packages/ui/src/components/`
+- Use variant/size prop patterns with class-variance-authority
+- All components are in `packages/ui/src/components/ui/`
+- Utilities in `packages/ui/src/lib/utils.ts` (includes `cn` helper for className merging)
 
 Available components:
-- Button (variants: primary, secondary, danger, ghost; sizes: sm, md, lg; loading state)
+- Button (uses Radix Slot, multiple variants and sizes)
 - Input
 - Card
 - Badge
 - Textarea
+- Label (Radix UI)
+- Select (Radix UI)
+- Separator (Radix UI)
+- Item (custom component)
 
 ### Next.js Application (@devboard-interactive/web)
 
@@ -146,19 +163,26 @@ Key configuration:
 
 ### Prisma Client Import
 
-Always import from the custom output location:
+Always import the singleton instance from `src/lib/prisma.ts`:
 ```typescript
-import { PrismaClient } from "../../generated/prisma/client";
+import { prisma } from "@/lib/prisma";
+```
+
+Or if importing types/client directly from generated code:
+```typescript
+import { PrismaClient } from "../generated/prisma/client";
 ```
 
 ### Component Development
 
 When creating new UI components:
-1. Add to `packages/ui/src/components/`
+1. Add to `packages/ui/src/components/ui/`
 2. Export component and props from component file
 3. Add exports to `packages/ui/src/index.ts`
 4. Rebuild the UI package or run in watch mode
 5. Use Tailwind utility classes for styling
+6. Consider using class-variance-authority for variants
+7. Use the `cn()` utility from `@/lib/utils` for className merging
 
 ### Database Schema Changes
 
@@ -175,11 +199,13 @@ The project has Prisma MCP server configured in `.mcp.json` for database operati
 
 ### Adding a New UI Component
 
-1. Create component file in `packages/ui/src/components/ComponentName.tsx`
+1. Create component file in `packages/ui/src/components/ui/ComponentName.tsx`
 2. Export component and props interface from the component file
 3. Add exports to `packages/ui/src/index.ts`
 4. Rebuild UI package: `npm run build --workspace=packages/ui`
 5. Use Tailwind utility classes for styling
+6. Consider using class-variance-authority for variant patterns
+7. Use the `cn()` utility from `@/lib/utils` for className merging
 
 ### Adding a Database Model
 
@@ -211,7 +237,9 @@ devboard/
 │   │   ├── src/
 │   │   │   ├── app/            # App Router pages and layouts
 │   │   │   ├── generated/      # Prisma Client output
+│   │   │   │   └── prisma/     # Generated Prisma Client
 │   │   │   └── lib/            # Utilities and singleton instances
+│   │   │       └── prisma.ts   # Prisma Client singleton with pg adapter
 │   │   ├── prisma/
 │   │   │   ├── schema.prisma   # Database schema
 │   │   │   └── seed.ts         # Database seed script
@@ -219,6 +247,8 @@ devboard/
 │   └── ui/                     # Shared component library
 │       ├── src/
 │       │   ├── components/     # React components
+│       │   │   └── ui/         # UI components
+│       │   ├── lib/            # Utilities (cn helper, etc.)
 │       │   └── index.ts        # Package exports
 │       └── dist/               # Built output (generated)
 ├── .mcp.json                   # MCP server configuration
