@@ -96,7 +96,9 @@ export function TaskForm({ mode, task, onSubmit, onCancel }: TaskFormProps) {
           </legend>
 
           <p className="text-sm text-muted-foreground text-balance">
-            Fill out the form below to add a new task to your task list.
+            {mode === "create"
+              ? "Fill out the form below to add a new task to your task list."
+              : "Update the task details below."}
           </p>
         </div>
 

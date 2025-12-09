@@ -8,7 +8,7 @@ export type StatusFilterProps = {
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "children">;
 
 export function StatusFilter({ children, ...props }: StatusFilterProps) {
-  const { filter, applyFilter: onFilterChange } = useTasks();
+  const { filter, applyFilter } = useTasks();
 
   return (
     <div className="flex gap-2 mb-4 flex-wrap items-center" {...props}>
@@ -21,7 +21,7 @@ export function StatusFilter({ children, ...props }: StatusFilterProps) {
               filter !== status && "cursor-pointer"
             )}
             variant={filter === status ? "secondary" : "outline"}
-            onClick={() => filter !== status && onFilterChange(status)}
+            onClick={() => filter !== status && applyFilter(status)}
           >
             {status === "ALL" ? "All" : statusLabels[status]}
           </Badge>

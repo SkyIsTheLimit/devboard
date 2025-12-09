@@ -1,7 +1,13 @@
 "use client";
 
 import { CreateTaskPayload, Label, Status, Task as TaskModel } from "@/types";
-import { createContext, useCallback, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { api } from "@/lib/api";
 
@@ -38,7 +44,6 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
   const [labels, setLabels] = useState<Label[]>([]);
   const [filter, setFilter] = useState<Status | "ALL">("ALL");
   const [loading, setLoading] = useState(0);
-  //   const [error, setError] = useState<string | null>(null);
 
   const applyFilter = (newFilter: Status | "ALL") => {
     setFilter(newFilter);
@@ -72,13 +77,13 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     setLoading((count) => count + 1);
     await api.tasks.delete(taskId);
     setLoading((count) => count - 1);
-    setTasks(tasks.filter((t) => t.id !== taskId));
+    setTasks((tasks) => tasks.filter((t) => t.id !== taskId));
   }
 
   async function createTask(newTaskData: CreateTaskPayload) {
     setLoading((count) => count + 1);
     const created = await api.tasks.create(newTaskData);
-    setTasks([...tasks, created]);
+    setTasks((tasks) => [...tasks, created]);
     setLoading((count) => count - 1);
     return created;
   }
@@ -90,7 +95,6 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         tasks,
         filter,
         loading,
-        // error,
         applyFilter,
         loadLabels,
         loadTasks,
@@ -113,26 +117,3 @@ export const useTasks = () => {
 
   return ctx;
 };
-
-/**
- *
- * // TasksProvider ->
- *      state: { tasks, filter },
- *      actions: {
- *          loadTasks(filter),
- *          createNewTask(newTaskData),
- *          updateTask(taskId, updatedData),
- *          deleteTask(taskId)
- *     }
- * <TasksProvider>
- *  <TasksContainer> -- pulls state and actions from context to provide to stateless children.
- *    <StatusFilter filter={context.filter} onFilterChange={context.onFilterChange} /> -- Stateless, uses props.onFilterChange to update.
- *    <Button>New Task</Button> -- opens a form to create a new task.
- *      <TaskForm mode="create" /> -- maintains form instance to create a new task, uses props.onCreate since mode is 'create'
- *    <TaskList tasks={context.tasks} onUpdate onDelete /> -- Stateless, gets tasks from parent.
- *    <TaskActions /> -- Contains 'Edit Task', 'Delete Task' actions, uses props.onEdit and props.onDelete
- *      <TaskForm mode="edit" onEdit /> -- maintains form instance to edit an existing task, uses props.onEdit since mode is 'edit'
- *   </TasksContainer>
- * </TasksProvider>
- *
- */

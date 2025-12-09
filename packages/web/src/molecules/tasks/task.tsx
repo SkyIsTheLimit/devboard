@@ -1,3 +1,4 @@
+import { ComponentProps, useCallback } from "react";
 import {
   Item,
   ItemActions,
@@ -12,7 +13,6 @@ import { Status, Task as TaskModel } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Loader } from "./loader";
 import { TaskLabels } from "./labels";
-import { useCallback } from "react";
 import { useTasks } from "./context";
 
 export const statusColors: Record<
@@ -43,7 +43,7 @@ export type TaskProps = {
   task: TaskModel;
   onEdit?: (updateTask: TaskModel) => void;
   onDelete?: (taskId: string) => void;
-} & (typeof Item)["arguments"];
+} & ComponentProps<typeof Item>;
 
 export function Task({ task, onEdit, onDelete, ...props }: TaskProps) {
   const { loading } = useTasks();
@@ -80,7 +80,6 @@ export function Task({ task, onEdit, onDelete, ...props }: TaskProps) {
 
         {task.labels.length > 0 && <TaskLabels labels={task.labels} />}
       </ItemContent>
-      <ItemFooter className="flex-col gap-2"></ItemFooter>
       <ItemActions>
         <Button variant="outline" size="sm" onClick={handleEdit}>
           <PenSquareIcon />

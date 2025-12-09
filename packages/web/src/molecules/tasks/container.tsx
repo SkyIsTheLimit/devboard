@@ -50,9 +50,13 @@ export function TasksContainer({ className }: { className?: string }) {
   }
 
   useEffect(() => {
+    // Load tasks should run everytime the filter changes.
     loadTasks();
+  }, [loadTasks]);
+
+  useEffect(() => {
     loadLabels();
-  }, [loadTasks, loadLabels]);
+  }, []);
 
   return (
     <>
@@ -73,12 +77,7 @@ export function TasksContainer({ className }: { className?: string }) {
       )}
 
       {!isFormVisible && (
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleNew}
-          // disabled={loading}
-        >
+        <Button variant="default" size="sm" onClick={handleNew}>
           Create New Task
         </Button>
       )}
