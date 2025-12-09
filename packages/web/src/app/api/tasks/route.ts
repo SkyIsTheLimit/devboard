@@ -1,6 +1,9 @@
-import { Priority, Status } from "@/generated/prisma/enums";
-import { prisma } from "@/lib/prisma";
+import * as Sentry from "@sentry/nextjs";
+
 import { NextRequest, NextResponse } from "next/server";
+import { Priority, Status } from "@/generated/prisma/enums";
+
+import { prisma } from "@/lib/prisma";
 
 // GET /api/tasks - List all tasks
 export async function GET(request: NextRequest) {
@@ -22,6 +25,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(tasks);
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { endpoint: "GET /api/tasks" },
+    });
+
     console.error("Failed to fetch tasks", error);
 
     return NextResponse.json(
@@ -63,6 +70,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { endpoint: "POST /api/tasks" },
+    });
+
     console.error("Failed to create task", error);
 
     return NextResponse.json(

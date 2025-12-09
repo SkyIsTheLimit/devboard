@@ -191,6 +191,136 @@ When creating new UI components:
 3. Prisma Client will auto-generate to `src/generated/prisma`
 4. Update seed file if needed
 
+## Observability and Monitoring
+
+The project uses Sentry for error tracking, performance monitoring, and logging.
+
+### Sentry Configuration
+
+In Next.js, Sentry is initialized in three locations:
+- **Client-side**: `instrumentation-client.(js|ts)`
+- **Server-side**: `sentry.server.config.ts`
+- **Edge runtime**: `sentry.edge.config.ts`
+
+Initialization only needs to happen in these files. To use Sentry functionality elsewhere, import with:
+```typescript
+import * as Sentry from "@sentry/nextjs";
+```
+
+#### Baseline Configuration
+
+```javascript
+import * as Sentry from "@sentry/nextjs";
+
+Sentry.init({
+  dsn: "https://e11c4288d6e6d0e8ff11407e88c8b6d2@o4510506402381824.ingest.us.sentry.io/4510506405986304",
+  enableLogs: true,
+});
+```
+
+#### Logger Integration
+
+```javascript
+Sentry.init({
+  dsn: "https://e11c4288d6e6d0e8ff11407e88c8b6d2@o4510506402381824.ingest.us.sentry.io/4510506405986304",
+  integrations: [
+    // send console.log, console.warn, and console.error calls as logs to Sentry
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+  ],
+});
+```
+
+### Exception Catching
+
+Use `Sentry.captureException(error)` to capture exceptions in try-catch blocks or areas where exceptions are expected:
+```typescript
+try {
+  // risky operation
+} catch (error) {
+  Sentry.captureException(error);
+}
+```
+
+### Tracing and Performance Monitoring
+
+Create spans for meaningful actions like button clicks, API calls, and function calls using `Sentry.startSpan`. Child spans can exist within a parent span.
+
+#### Custom Span in Component Actions
+
+The `name` and `op` properties should be meaningful for the activities in the call. Attach attributes based on relevant information and metrics:
+
+```javascript
+function TestComponent() {
+  const handleTestButtonClick = () => {
+    // Create a transaction/span to measure performance
+    Sentry.startSpan(
+      {
+        op: "ui.click",
+        name: "Test Button Click",
+      },
+      (span) => {
+        const value = "some config";
+        const metric = "some metric";
+
+        // Metrics can be added to the span
+        span.setAttribute("config", value);
+        span.setAttribute("metric", metric);
+
+        doSomething();
+      },
+    );
+  };
+
+  return (
+    <button type="button" onClick={handleTestButtonClick}>
+      Test Sentry
+    </button>
+  );
+}
+```
+
+#### Custom Span in API Calls
+
+```javascript
+async function fetchUserData(userId) {
+  return Sentry.startSpan(
+    {
+      op: "http.client",
+      name: `GET /api/users/${userId}`,
+    },
+    async () => {
+      const response = await fetch(`/api/users/${userId}`);
+      const data = await response.json();
+      return data;
+    },
+  );
+}
+```
+
+### Logging
+
+Sentry provides structured logging with `logger.fmt` template literal function for variables:
+
+```javascript
+const { logger } = Sentry;
+
+logger.trace("Starting database connection", { database: "users" });
+logger.debug(logger.fmt`Cache miss for user: ${userId}`);
+logger.info("Updated profile", { profileId: 345 });
+logger.warn("Rate limit reached for endpoint", {
+  endpoint: "/api/results/",
+  isEnterprise: false,
+});
+logger.error("Failed to process payment", {
+  orderId: "order_123",
+  amount: 99.99,
+});
+logger.fatal("Database connection pool exhausted", {
+  database: "users",
+  activeConnections: 100,
+});
+```
+
 ## MCP Configuration
 
 The project has Prisma MCP server configured in `.mcp.json` for database operations via Model Context Protocol.
