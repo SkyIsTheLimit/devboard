@@ -14,29 +14,28 @@ export interface Label {
 export interface Task {
   id: string;
   title: string;
-  description: string | null;
+  description?: string;
   status: Status;
   priority: Priority;
-  dueDate: string | null;
-  createdAt: string;
-  updatedAt: string;
+  dueDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
   labels: Label[];
 }
 
-export interface CreateTaskInput {
-  title: string;
+export type CreateTaskPayload = {
+  title: Task["title"];
+  status: Task["status"];
+  labelIds?: string[];
+} & Partial<
+  Omit<Task, "id" | "title" | "status" | "labels" | "createdAt" | "updatedAt">
+>;
+
+export interface UpdateTaskPayload {
+  title?: string;
   description?: string;
   status?: Status;
   priority?: Priority;
-  dueDate?: string;
-  labelIds?: string[];
-}
-
-export interface UpdateTaskInput {
-  title?: string;
-  description?: string | null;
-  status?: Status;
-  priority?: Priority;
-  dueDate?: string | null;
+  dueDate?: Date;
   labelIds?: string[];
 }
