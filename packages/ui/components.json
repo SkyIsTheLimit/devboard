@@ -13,11 +13,9 @@
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
-    "molecules": "@/molecules",
-    "utils": "@/lib/utils",
     "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "utils": "@/lib/utils",
+    "hooks": "@/lib/hooks"
   },
   "registries": {}
 }

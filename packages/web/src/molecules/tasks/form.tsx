@@ -1,23 +1,23 @@
 "use client";
 
-import type { CreateTaskPayload, Priority, Task } from "@/types";
 import {
+  Button,
+  Card,
+  Input,
+  Label,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+  Textarea,
+} from "@devboard-interactive/ui";
+import type { CreateTaskPayload, Priority, Task } from "@/types";
 import { SelectableLabel, TaskLabels } from "./labels";
 import { useMemo, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader } from "./loader";
-import { Textarea } from "@/components/ui/textarea";
 import { useTasks } from "./context";
 
 export type TaskFormProps = {

@@ -1,4 +1,6 @@
-import { Badge, BadgeProps } from "@/components/ui/badge";
+"use client";
+
+import { Badge, BadgeProps } from "@devboard-interactive/ui";
 
 import { Label } from "@/types";
 

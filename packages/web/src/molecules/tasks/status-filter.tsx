@@ -1,4 +1,6 @@
-import { Badge } from "@/components/ui/badge";
+"use client";
+
+import { Badge } from "@devboard-interactive/ui";
 import { cn } from "@/lib/utils";
 import { statusLabels } from "@/molecules/tasks";
 import { useTasks } from "./context";

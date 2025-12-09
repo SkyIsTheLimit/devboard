@@ -1,16 +1,17 @@
-import { ComponentProps, useCallback } from "react";
+"use client";
+
 import {
+  Button,
   Item,
   ItemActions,
   ItemContent,
   ItemDescription,
-  ItemFooter,
   ItemTitle,
-} from "@/components/ui/item";
+} from "@devboard-interactive/ui";
+import { ComponentProps, useCallback } from "react";
 import { PenSquareIcon, Trash2Icon } from "lucide-react";
 import { Status, Task as TaskModel } from "@/types";
 
-import { Button } from "@/components/ui/button";
 import { Loader } from "./loader";
 import { TaskLabels } from "./labels";
 import { useTasks } from "./context";
