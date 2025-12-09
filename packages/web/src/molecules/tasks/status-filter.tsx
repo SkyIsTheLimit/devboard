@@ -28,7 +28,7 @@ export function StatusFilter({ children, ...props }: StatusFilterProps) {
         )
       )}
 
-      {children && children}
+      {children}
     </div>
   );
 }

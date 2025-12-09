@@ -1,13 +1,7 @@
 "use client";
 
 import { CreateTaskPayload, Label, Status, Task as TaskModel } from "@/types";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 import { api } from "@/lib/api";
 
