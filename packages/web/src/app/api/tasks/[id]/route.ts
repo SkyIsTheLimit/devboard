@@ -1,4 +1,7 @@
+import * as Sentry from "@sentry/nextjs";
+
 import { NextRequest, NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 
 interface RouteParams {
@@ -21,6 +24,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(task);
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { endpoint: "GET /api/tasks/[id]" },
+    });
+
     console.error("Failed to fetch task:", error);
     return NextResponse.json(
       { error: "Failed to fetch task" },
@@ -65,6 +72,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(task);
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { endpoint: "PATCH /api/tasks/[id]" },
+    });
+
     console.error("Failed to update task:", error);
     return NextResponse.json(
       { error: "Failed to update task" },
@@ -87,6 +98,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { endpoint: "DELETE /api/tasks/[id]" },
+    });
+
     console.error("Failed to delete task:", error);
     return NextResponse.json(
       { error: "Failed to delete task" },

@@ -1,4 +1,7 @@
+import * as Sentry from "@sentry/nextjs";
+
 import { NextRequest, NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 
 // GET /api/labels — List all labels
@@ -15,6 +18,10 @@ export async function GET() {
 
     return NextResponse.json(labels);
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { endpoint: "GET /api/labels" },
+    });
+
     console.error("Failed to fetch labels:", error);
     return NextResponse.json(
       { error: "Failed to fetch labels" },
@@ -54,6 +61,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(label, { status: 201 });
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { endpoint: "POST /api/labels" },
+    });
+
     console.error("Failed to create label:", error);
     return NextResponse.json(
       { error: "Failed to create label" },
