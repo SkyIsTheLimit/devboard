@@ -1,0 +1,5 @@
+{
+  "framework": "nextjs",
+  "installCommand": "bash install.sh",
+  "buildCommand": "bash build.sh"
+}
