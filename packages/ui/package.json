@@ -40,11 +40,19 @@
         "components",
         "ui",
         "devboard",
-        "devboard-interactive"
+        "devboard-interactive",
+        "typescript",
+        "tailwindcss"
     ],
+    "author": "Sandeep Prasad (https://github.com/SkyIsTheLimit)",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/skyisthelimit/devboard.git"
-    }
+        "url": "https://github.com/skyisthelimit/devboard.git",
+        "directory": "packages/ui"
+    },
+    "bugs": {
+        "url": "https://github.com/skyisthelimit/devboard/issues"
+    },
+    "homepage": "https://github.com/skyisthelimit/devboard/tree/main/packages/ui#readme"
 }
