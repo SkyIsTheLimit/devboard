@@ -6,6 +6,7 @@ echo "VERCEL_ENV: $VERCEL_ENV"
 
 if [ "$VERCEL_ENV" = "production" ]; then
   echo "🚀 Production install: installing from npm registry"
+  cd ../..
   npm install
 else
   echo "🔧 Preview install: installing with workspace dependencies"
