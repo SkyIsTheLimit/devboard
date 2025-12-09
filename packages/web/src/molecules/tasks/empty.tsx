@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card } from "@devboard-interactive/ui";
 
 export function Empty() {
   return (

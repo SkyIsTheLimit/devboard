@@ -1,14 +1,13 @@
 "use client";
 
+import { Button, cn } from "@devboard-interactive/ui";
 import { CreateTaskPayload, Task } from "@/types";
 import { TaskForm, TaskFormProps } from "./form";
 import { useEffect, useState } from "react";
 
-import { Button } from "../../components/ui/button";
 import { Loader } from "./loader";
 import { StatusFilter } from "./status-filter";
 import { TaskList } from "./list";
-import { cn } from "@/lib/utils";
 import { useTasks } from "./context";
 
 export function TasksContainer({ className }: { className?: string }) {
