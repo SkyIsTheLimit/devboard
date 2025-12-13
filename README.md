@@ -27,7 +27,9 @@ DevBoard is a modern task management application designed for developers and tea
 
 ### Features
 
+- **User Authentication**: Secure sign-in with Google and GitHub OAuth
 - **Intuitive Task Management**: Create, organize, and track tasks with ease
+- **Multi-User Support**: Each user has their own private task list
 - **Label System**: Categorize tasks with customizable colored labels
 - **Priority Levels**: Assign priority (Low, Medium, High, Urgent) to stay focused
 - **Status Tracking**: Track progress through TODO, IN_PROGRESS, IN_REVIEW, and DONE states
@@ -121,8 +123,23 @@ npm install
 Create a `.env` file in `packages/web/`:
 
 ```env
+# Database
 DATABASE_URL="postgresql://user:password@localhost:5432/devboard?schema=public"
+
+# Authentication (required)
+AUTH_SECRET="your-secret-key-here-generate-with-openssl-rand-base64-32"
+AUTH_TRUST_HOST="true"
+
+# Google OAuth
+AUTH_GOOGLE_ID="your-google-client-id"
+AUTH_GOOGLE_SECRET="your-google-client-secret"
+
+# GitHub OAuth
+AUTH_GITHUB_ID="your-github-client-id"
+AUTH_GITHUB_SECRET="your-github-client-secret"
 ```
+
+See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for instructions on setting up OAuth credentials.
 
 4. **Set up the database**
 
