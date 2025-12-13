@@ -33,11 +33,28 @@ npm install
 
 ### Environment Setup
 
-Create a `.env` file in this directory (`packages/web/`) with your database connection:
+Create a `.env` file in this directory (`packages/web/`) with your database connection and authentication credentials:
 
 ```env
+# Database
 DATABASE_URL="postgresql://user:password@localhost:5432/devboard"
+
+# Authentication
+AUTH_SECRET="your-secret-key-here-generate-with-openssl-rand-base64-32"
+AUTH_TRUST_HOST="true"
+
+# Google OAuth
+AUTH_GOOGLE_ID="your-google-client-id"
+AUTH_GOOGLE_SECRET="your-google-client-secret"
+
+# GitHub OAuth
+AUTH_GITHUB_ID="your-github-client-id"
+AUTH_GITHUB_SECRET="your-github-client-secret"
 ```
+
+To get OAuth credentials:
+- **Google**: Create a project at [Google Cloud Console](https://console.cloud.google.com/) and set up OAuth 2.0 credentials
+- **GitHub**: Register a new OAuth App at [GitHub Developer Settings](https://github.com/settings/developers)
 
 ### Database Setup
 
@@ -114,8 +131,19 @@ This project uses the experimental React Compiler enabled via `reactCompiler: tr
 
 Current schema includes:
 
-- **Task**: Core task entity with title, description, status, priority, dueDate, and labels
+- **User**: User accounts with OAuth authentication support
+- **Account**: OAuth provider accounts linked to users
+- **Session**: User session management
+- **Task**: Core task entity with title, description, status, priority, dueDate, labels, and user ownership
 - **Label**: Reusable labels with name and color that can be attached to tasks
+
+### Authentication
+
+The application uses NextAuth.js (Auth.js v5) for authentication with support for:
+- Google OAuth
+- GitHub OAuth
+
+Users must sign in to access the application. Tasks are automatically associated with the authenticated user and filtered accordingly.
 
 ## Available Scripts
 
