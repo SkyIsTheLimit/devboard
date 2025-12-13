@@ -18,6 +18,14 @@ export default auth((req) => {
   return NextResponse.next();
 });
 
+/**
+ * Matcher configuration for middleware
+ * Excludes:
+ * - /api/auth/* - NextAuth.js API routes
+ * - /_next/static/* - Static files
+ * - /_next/image/* - Image optimization files
+ * - /favicon.ico - Favicon
+ */
 export const config = {
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
 };

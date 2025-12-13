@@ -1,5 +1,6 @@
 import { auth, signOut } from "@/auth";
 import { Button } from "@devboard-interactive/ui";
+import Image from "next/image";
 
 export async function Header() {
   const session = await auth();
@@ -11,10 +12,12 @@ export async function Header() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             {session.user.image && (
-              <img
+              <Image
                 src={session.user.image}
-                alt={session.user.name || "User"}
-                className="w-8 h-8 rounded-full"
+                alt={session.user.name || "User avatar"}
+                width={32}
+                height={32}
+                className="rounded-full"
               />
             )}
             <span className="text-sm text-primary-muted-400">
