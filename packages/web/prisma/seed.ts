@@ -1,6 +1,19 @@
 import { prisma } from "@/lib/prisma";
 
 async function main() {
+  // Create a demo user
+  const demoUser = await prisma.user.upsert({
+    where: { email: "demo@devboard.dev" },
+    update: {},
+    create: {
+      email: "demo@devboard.dev",
+      name: "Demo User",
+      emailVerified: new Date(),
+    },
+  });
+
+  console.log(`Created demo user: ${demoUser.email}`);
+
   // Create labels
   const labels = await Promise.all([
     prisma.label.upsert({
@@ -32,7 +45,7 @@ async function main() {
 
   console.log(`Created ${labels.length} labels`);
 
-  // Create sample tasks
+  // Create sample tasks for demo user
   const tasks = await Promise.all([
     prisma.task.create({
       data: {
@@ -40,6 +53,7 @@ async function main() {
         description: "Initialize the monorepo structure with npm workspaces",
         status: "DONE",
         priority: "HIGH",
+        userId: demoUser.id,
         labels: {
           connect: [{ name: "feature" }],
         },
@@ -51,6 +65,7 @@ async function main() {
         description: "Create Prisma schema for tasks and labels",
         status: "DONE",
         priority: "HIGH",
+        userId: demoUser.id,
         labels: {
           connect: [{ name: "feature" }, { name: "documentation" }],
         },
@@ -63,6 +78,7 @@ async function main() {
           "Build API routes for creating, reading, updating, and deleting tasks",
         status: "IN_PROGRESS",
         priority: "HIGH",
+        userId: demoUser.id,
         labels: {
           connect: [{ name: "feature" }],
         },
@@ -74,6 +90,7 @@ async function main() {
         description: "Implement vim-style navigation and quick actions",
         status: "TODO",
         priority: "MEDIUM",
+        userId: demoUser.id,
         labels: {
           connect: [{ name: "enhancement" }],
         },
@@ -85,6 +102,7 @@ async function main() {
         description: "The color picker dropdown closes unexpectedly on mobile",
         status: "TODO",
         priority: "LOW",
+        userId: demoUser.id,
         labels: {
           connect: [{ name: "bug" }],
         },
@@ -92,7 +110,7 @@ async function main() {
     }),
   ]);
 
-  console.log(`Created ${tasks.length} tasks`);
+  console.log(`Created ${tasks.length} tasks for demo user`);
 }
 
 main()

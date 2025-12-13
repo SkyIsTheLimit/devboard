@@ -2,18 +2,25 @@ import * as Sentry from "@sentry/nextjs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { Priority, Status } from "@/generated/prisma/enums";
+import { auth } from "@/auth";
 
 import { prisma } from "@/lib/prisma";
 
 // GET /api/tasks - List all tasks
 export async function GET(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const priority = searchParams.get("priority");
 
     const tasks = await prisma.task.findMany({
       where: {
+        userId: session.user.id,
         ...(status && { status: status as Status }),
         ...(priority && { priority: priority as Priority }),
       },
@@ -43,6 +50,11 @@ export async function GET(request: NextRequest) {
 // POST /api/tasks - Create a new task
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { title, description, priority, status, dueDate, labelIds } = body;
 
@@ -57,6 +69,7 @@ export async function POST(request: NextRequest) {
         priority: priority || Priority.MEDIUM,
         status: status || Status.TODO,
         dueDate: dueDate ? new Date(dueDate) : null,
+        userId: session.user.id,
         labels: labelIds?.length
           ? {
               connect: labelIds.map((id: string) => ({ id })),
