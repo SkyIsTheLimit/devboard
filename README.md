@@ -17,6 +17,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [![CI](https://github.com/SkyIsTheLimit/devboard/actions/workflows/ci.yml/badge.svg)](https://github.com/SkyIsTheLimit/devboard/actions/workflows/ci.yml)
+[![NPM](https://img.shields.io/npm/v/@devboard-interactive/ui)](https://img.shields.io/npm/v/@devboard-interactive/ui)
 </div>
 
 ---
