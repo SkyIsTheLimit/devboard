@@ -1,9 +1,4 @@
-import type {
-  CreateTaskPayload,
-  Label,
-  Task,
-  UpdateTaskPayload,
-} from "@/types";
+import type { CreateTaskDto, LabelDto, TaskDto, UpdateTaskDto } from "@/types";
 
 const API_BASE = "/api";
 
@@ -20,37 +15,37 @@ export const api = {
     list: async (filters?: {
       status?: string;
       priority?: string;
-    }): Promise<Task[]> => {
+    }): Promise<TaskDto[]> => {
       const params = new URLSearchParams();
       if (filters?.status) params.set("status", filters.status);
       if (filters?.priority) params.set("priority", filters.priority);
 
       const url = `${API_BASE}/tasks${params.toString() ? `?${params}` : ""}`;
       const response = await fetch(url);
-      return handleResponse<Task[]>(response);
+      return handleResponse<TaskDto[]>(response);
     },
 
-    get: async (id: string): Promise<Task> => {
+    get: async (id: string): Promise<TaskDto> => {
       const response = await fetch(`${API_BASE}/tasks/${id}`);
-      return handleResponse<Task>(response);
+      return handleResponse<TaskDto>(response);
     },
 
-    create: async (data: CreateTaskPayload): Promise<Task> => {
+    create: async (data: CreateTaskDto): Promise<TaskDto> => {
       const response = await fetch(`${API_BASE}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      return handleResponse<Task>(response);
+      return handleResponse<TaskDto>(response);
     },
 
-    update: async (id: string, data: UpdateTaskPayload): Promise<Task> => {
+    update: async (id: string, data: UpdateTaskDto): Promise<TaskDto> => {
       const response = await fetch(`${API_BASE}/tasks/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      return handleResponse<Task>(response);
+      return handleResponse<TaskDto>(response);
     },
 
     delete: async (id: string): Promise<void> => {
@@ -62,18 +57,21 @@ export const api = {
   },
 
   labels: {
-    list: async (): Promise<Label[]> => {
+    list: async (): Promise<LabelDto[]> => {
       const response = await fetch(`${API_BASE}/labels`);
-      return handleResponse<Label[]>(response);
+      return handleResponse<LabelDto[]>(response);
     },
 
-    create: async (data: { name: string; color?: string }): Promise<Label> => {
+    create: async (data: {
+      name: string;
+      color?: string;
+    }): Promise<LabelDto> => {
       const response = await fetch(`${API_BASE}/labels`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      return handleResponse<Label>(response);
+      return handleResponse<LabelDto>(response);
     },
   },
 };

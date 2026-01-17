@@ -1,58 +1,61 @@
 {
-    "name": "@devboard-interactive/ui",
-    "version": "0.0.3",
-    "description": "React component library for the DevBoard application.",
-    "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "build": "tsup src/index.ts --format cjs,esm --dts",
-        "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-        "lint": "eslint src/",
-        "type-check": "tsc --noEmit"
-    },
-    "peerDependencies": {
-        "react": "^19.2.0",
-        "react-dom": "^19.2.0"
-    },
-    "devDependencies": {
-        "@eslint/compat": "^2.0.0",
-        "@eslint/eslintrc": "^3.3.3",
-        "@eslint/js": "^9.39.1",
-        "@types/react": "^18.2.0",
-        "@types/react-dom": "^18.2.0",
-        "@typescript-eslint/eslint-plugin": "^8.48.0",
-        "@typescript-eslint/parser": "^8.48.0",
-        "eslint": "^9.39.1",
-        "eslint-plugin-react": "^7.37.5",
-        "eslint-plugin-react-hooks": "^7.0.1",
-        "globals": "^14.0.0",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "tsup": "^8.0.0",
-        "typescript": "^5.0.0"
-    },
-    "keywords": [
-        "react",
-        "components",
-        "ui",
-        "devboard",
-        "devboard-interactive",
-        "typescript",
-        "tailwindcss"
-    ],
-    "author": "Sandeep Prasad (https://github.com/SkyIsTheLimit)",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/skyisthelimit/devboard.git",
-        "directory": "packages/ui"
-    },
-    "bugs": {
-        "url": "https://github.com/skyisthelimit/devboard/issues"
-    },
-    "homepage": "https://github.com/skyisthelimit/devboard/tree/main/packages/ui#readme"
+  "name": "@devboard-interactive/ui",
+  "version": "0.0.3",
+  "description": "React component library for the DevBoard application.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^2.0.0",
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^14.0.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "react",
+    "components",
+    "ui",
+    "devboard",
+    "devboard-interactive",
+    "typescript",
+    "tailwindcss"
+  ],
+  "author": "Sandeep Prasad (https://github.com/SkyIsTheLimit)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyisthelimit/devboard.git",
+    "directory": "packages/ui"
+  },
+  "bugs": {
+    "url": "https://github.com/skyisthelimit/devboard/issues"
+  },
+  "homepage": "https://github.com/skyisthelimit/devboard/tree/main/packages/ui#readme",
+  "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.16"
+  }
 }

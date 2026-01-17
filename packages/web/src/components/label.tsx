@@ -2,10 +2,10 @@
 
 import { Badge, BadgeProps } from "@devboard-interactive/ui";
 
-import { Label } from "@/types";
+import { LabelDto } from "@/types";
 
 export type TaskLabelProps = {
-  label: Label;
+  label: LabelDto;
 } & BadgeProps;
 
 export const TaskLabel = ({ label, style, ...props }: TaskLabelProps) => (

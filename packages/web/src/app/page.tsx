@@ -1,13 +1,24 @@
-import { Header } from "@/components/header";
-import { Tasks } from "@/molecules/tasks";
+import { Container } from "@/components/container";
+import { TasksList } from "@/components/task-list";
+import { auth } from "@/auth";
+import { parseSearchForStatus } from "@/components/FilterStatus";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home({
+  searchParams: searchParamsPromise,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchParams = await searchParamsPromise;
+  const session = await auth();
+
+  if (!session) redirect("/signin");
+
+  const searchItem = parseSearchForStatus(searchParams.status?.toString());
+
   return (
-    <main className="min-h-screen p-8 bg-primary-muted-2400 text-primary-muted-200 font-sans">
-      <div className="max-w-4xl mx-auto">
-        <Header />
-        <Tasks />
-      </div>
-    </main>
+    <Container className="flex-1 py-4 w-full">
+      <TasksList status={searchItem.status} />
+    </Container>
   );
 }

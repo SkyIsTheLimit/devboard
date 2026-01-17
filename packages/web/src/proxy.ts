@@ -1,8 +1,9 @@
-import { auth } from "@/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "./auth";
 
-export default auth((req) => {
-  const isAuthenticated = !!req.auth;
+export async function proxy(req: NextRequest) {
+  const session = await auth();
+  const isAuthenticated = !!session;
   const isAuthPage = req.nextUrl.pathname.startsWith("/signin");
 
   // If not authenticated and not on auth page, redirect to signin
@@ -16,7 +17,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next();
-});
+}
 
 /**
  * Matcher configuration for middleware

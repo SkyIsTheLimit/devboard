@@ -1,41 +1,39 @@
-export type Status = "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
-export type Priority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+import {
+  Label as PrismaLabel,
+  Priority as PrismaPriority,
+  Status as PrismaStatus,
+  Task as PrismaTask,
+} from "@/generated/prisma/client";
 
-export interface Label {
-  id: string;
-  name: string;
-  color: string;
-  createdAt: string;
+export type Status = PrismaStatus;
+export type Priority = PrismaPriority;
+
+export type LabelDto = Pick<PrismaLabel, "id" | "name" | "color"> & {
   _count?: {
     tasks: number;
   };
-}
+};
+export type TaskDto = PrismaTask & {
+  labels: LabelDto[];
+};
 
-export interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: Status;
-  priority: Priority;
-  dueDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  labels: Label[];
-}
-
-export type CreateTaskPayload = {
-  title: Task["title"];
-  status: Task["status"];
+export type CreateTaskDto = {
+  title: TaskDto["title"];
+  status: TaskDto["status"];
   labelIds?: string[];
 } & Partial<
-  Omit<Task, "id" | "title" | "status" | "labels" | "createdAt" | "updatedAt">
+  Omit<
+    TaskDto,
+    "id" | "title" | "status" | "labels" | "createdAt" | "updatedAt"
+  >
 >;
 
-export interface UpdateTaskPayload {
-  title?: string;
-  description?: string;
-  status?: Status;
-  priority?: Priority;
-  dueDate?: Date;
-  labelIds?: string[];
-}
+export type UpdateTaskDto = Pick<TaskDto, "id"> &
+  Partial<
+    Pick<
+      TaskDto,
+      "title" | "description" | "status" | "priority" | "dueDate"
+    > & {
+      labelIds: string[];
+    }
+  >;

@@ -1,7 +1,7 @@
-import { Label } from "@/types";
+import { LabelDto } from "@/types";
 import { TaskLabel } from "./label";
 
-export type SelectableLabel = Label & { selected: boolean };
+export type SelectableLabel = LabelDto & { selected: boolean };
 
 export type TaskLabelsProps =
   | {
@@ -11,7 +11,7 @@ export type TaskLabelsProps =
     }
   | {
       mode?: "normal";
-      labels: Label[];
+      labels: LabelDto[];
       onToggle?: never;
     };
 

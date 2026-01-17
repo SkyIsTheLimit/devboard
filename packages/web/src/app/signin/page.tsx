@@ -1,17 +1,21 @@
 import { signIn } from "@/auth";
 import { Button } from "@devboard-interactive/ui";
+import Image from "next/image";
+import logo from "@/app/logo.png";
 
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary-muted-2400">
-      <div className="max-w-md w-full space-y-8 p-8 bg-primary-muted-2300 rounded-lg shadow-lg">
-        <div className="text-center">
+      <div className="max-w-md w-full space-y-8 p-8 bg-primary-muted-2300 rounded-lg border">
+        <div className="text-center flex flex-col items-center">
+          <div className="border rounded-full p-4 mb-4">
+            <Image src={logo} width={96} height={96} alt="DevBoard Logo" />
+          </div>
+
           <h1 className="text-4xl font-bold text-primary-muted-200 mb-2">
             DevBoard
           </h1>
-          <p className="text-primary-muted-400">
-            Sign in to manage your tasks
-          </p>
+          <p className="text-primary-muted-400">Sign in to manage your tasks</p>
         </div>
 
         <div className="space-y-4">
