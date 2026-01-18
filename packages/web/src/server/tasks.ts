@@ -50,7 +50,7 @@ export async function updateTask(task: UpdateTaskDto) {
   }
 
   const updatedTask = await prisma.task.update({
-    where: { id: task.id },
+    where: { id: task.id, userId: session.user.id },
     data: {
       ...task,
       labels: task.labelIds
@@ -65,7 +65,6 @@ export async function updateTask(task: UpdateTaskDto) {
 }
 
 export async function deleteTask(taskId: string) {
-  console.log("REQUEST", "DELETE", taskId);
   const session = await auth();
 
   if (!session) {
@@ -73,6 +72,6 @@ export async function deleteTask(taskId: string) {
   }
 
   await prisma.task.delete({
-    where: { id: taskId },
+    where: { id: taskId, userId: session.user.id },
   });
 }

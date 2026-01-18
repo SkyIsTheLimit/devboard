@@ -12,7 +12,7 @@ import {
 import { LoaderCircle, Menu } from "lucide-react";
 
 import { Container } from "./container";
-import { SearchItem } from "./FilterStatus";
+import { SearchItem } from "./filter-status";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -75,7 +75,7 @@ export function Filter({
 }) {
   const [isLoading, setLoading] = useState(false);
   const [loadingItem, setLoadingItem] = useState<SearchItem | undefined>(
-    undefined
+    undefined,
   );
   const router = useRouter();
 
@@ -112,7 +112,7 @@ export function Filter({
               className={cn(
                 "flex flex-wrap gap-0",
                 "rounded capitalize font-normal px-2 py-0",
-                status === activeItem.status && "font-bold"
+                status === activeItem.status && "font-bold",
               )}
               disabled={status === activeItem.status}
             >

@@ -1,7 +1,7 @@
 import { Container } from "@/components/container";
 import { TasksList } from "@/components/task-list";
 import { auth } from "@/auth";
-import { parseSearchForStatus } from "@/components/FilterStatus";
+import { parseSearchForStatus } from "@/components/filter-status";
 import { redirect } from "next/navigation";
 
 export default async function Home({

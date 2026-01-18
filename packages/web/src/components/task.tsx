@@ -11,10 +11,10 @@ import {
 import { ComponentProps, useCallback } from "react";
 import { Copy, Flag, PenSquareIcon, Trash2Icon } from "lucide-react";
 import { Status, TaskDto as TaskModel } from "@/types";
+import { createTask, deleteTask } from "@/server/tasks";
 
 import { TaskLabels } from "./labels";
 import { cn } from "@/lib/utils";
-import { deleteTask } from "@/server/tasks";
 
 export const statusColors: Record<
   Status,
@@ -48,7 +48,9 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
     }
   }, [onEdit, task]);
 
-  const handleDelete = (taskId: string) => deleteTask(taskId);
+  const handleDelete = () => deleteTask(task.id);
+
+  const handleClone = () => {};
 
   return (
     <Item
@@ -61,7 +63,7 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
           <ItemTitle className="font-black">{task.title}</ItemTitle>
           <span
             className={cn(
-              "inline-flex items-center gap-2 font-normal text-secondary"
+              "inline-flex items-center gap-2 font-normal text-secondary",
             )}
             title={`${task.priority.toLowerCase()} priority`}
           >
@@ -85,7 +87,7 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
             variant="ghost"
             // disabled={!!loading}
             size="sm"
-            onClick={() => handleDelete(task.id)}
+            // onClick={() => handleDelete(task.id)}
           >
             {/* {!!loading && <Loader />} */}
             <Copy />
@@ -96,7 +98,7 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
           variant="ghost"
           // disabled={!!loading}
           size="sm"
-          onClick={() => handleDelete(task.id)}
+          onClick={() => handleDelete()}
         >
           {/* {!!loading && <Loader />} */}
           <Trash2Icon />

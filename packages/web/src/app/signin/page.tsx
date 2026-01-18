@@ -1,21 +1,19 @@
-import { signIn } from "@/auth";
 import { Button } from "@devboard-interactive/ui";
 import Image from "next/image";
 import logo from "@/app/logo.png";
+import { signIn } from "@/auth";
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-primary-muted-2400">
-      <div className="max-w-md w-full space-y-8 p-8 bg-primary-muted-2300 rounded-lg border">
+    <div className="min-h-screen flex items-start justify-center pt-48">
+      <div className="max-w-md w-full space-y-8 p-8 rounded-lg border mx-4 md:mx-0">
         <div className="text-center flex flex-col items-center">
-          <div className="border rounded-full p-4 mb-4">
+          <div className="mb-4">
             <Image src={logo} width={96} height={96} alt="DevBoard Logo" />
           </div>
 
-          <h1 className="text-4xl font-bold text-primary-muted-200 mb-2">
-            DevBoard
-          </h1>
-          <p className="text-primary-muted-400">Sign in to manage your tasks</p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">DevBoard</h1>
+          <p>Sign in to manage your tasks</p>
         </div>
 
         <div className="space-y-4">
@@ -64,7 +62,7 @@ export default function SignInPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-primary-muted-500 mt-4">
+        <p className="text-center text-sm  mt-4 text-secondary">
           By signing in, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>

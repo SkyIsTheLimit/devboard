@@ -1,6 +1,6 @@
-import { parseSearchForStatus, searchList } from "@/components/FilterStatus";
+import { parseSearchForStatus, searchList } from "@/components/filter-status";
 
-import { Filter } from "@/components/Filter";
+import { Filter } from "@/components/filter";
 
 export default async function FilterSlot({
   searchParams,
