@@ -2,17 +2,12 @@
 
 import { Status, TaskDto, UpdateTaskDto } from "@/types";
 
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { withAuth } from "./with-auth";
 
-export async function createTask(formData: FormData) {
-  const session = await auth();
+export const createTask = withAuth(async ({ userId }, formData: FormData) => {
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
 
   if (!title) {
     throw new Error("Title is required");
@@ -22,35 +17,25 @@ export async function createTask(formData: FormData) {
     data: {
       title,
       description,
-      userId: session?.user.id,
+      userId,
     },
   });
-}
+});
 
-export async function getTasks(status?: Status): Promise<TaskDto[]> {
-  const session = await auth();
+export const getTasks = withAuth(
+  async ({ userId }, status?: Status): Promise<TaskDto[]> => {
+    const tasks: TaskDto[] = await prisma.task.findMany({
+      where: { AND: [{ userId }, status ? { status } : {}] },
+      include: { labels: true },
+    });
 
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
+    return tasks;
+  },
+);
 
-  const tasks: TaskDto[] = await prisma.task.findMany({
-    where: { AND: [{ userId: session.user.id }, status ? { status } : {}] },
-    include: { labels: true },
-  });
-
-  return tasks;
-}
-
-export async function updateTask(task: UpdateTaskDto) {
-  const session = await auth();
-
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
+export const updateTask = withAuth(async ({ userId }, task: UpdateTaskDto) => {
   const updatedTask = await prisma.task.update({
-    where: { id: task.id, userId: session.user.id },
+    where: { id: task.id, userId },
     data: {
       ...task,
       labels: task.labelIds
@@ -62,19 +47,13 @@ export async function updateTask(task: UpdateTaskDto) {
   });
 
   return updatedTask;
-}
+});
 
-export async function cloneTask(taskId: string) {
-  const session = await auth();
-
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
+export const cloneTask = withAuth(async ({ userId }, taskId: string) => {
   const existingTask = await prisma.task.findUnique({
     where: {
       id: taskId,
-      userId: session.user.id,
+      userId,
     },
     include: {
       labels: true,
@@ -89,22 +68,16 @@ export async function cloneTask(taskId: string) {
     data: {
       title: existingTask.title,
       description: existingTask.description,
-      userId: session?.user.id,
+      userId,
       labels: {
         connect: existingTask.labels.map((label) => ({ id: label.id })),
       },
     },
   });
-}
+});
 
-export async function deleteTask(taskId: string) {
-  const session = await auth();
-
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
+export const deleteTask = withAuth(async ({ userId }, taskId: string) => {
   await prisma.task.delete({
-    where: { id: taskId, userId: session.user.id },
+    where: { id: taskId, userId },
   });
-}
+});

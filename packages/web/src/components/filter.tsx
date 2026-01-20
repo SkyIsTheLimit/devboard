@@ -1,16 +1,16 @@
 "use client";
 
 import {
-  Button,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@devboard-interactive/ui";
+} from "@devboard-interactive/ui/dropdown-menu";
 import { LoaderCircle, Menu } from "lucide-react";
 
+import { Button } from "@devboard-interactive/ui/button";
 import { Container } from "./container";
 import { SearchItem } from "./filter-status";
 import { cn } from "@/lib/utils";

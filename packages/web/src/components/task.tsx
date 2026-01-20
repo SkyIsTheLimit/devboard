@@ -1,18 +1,18 @@
 "use client";
 
+import { ComponentProps, useCallback } from "react";
+import { Copy, Flag, PenSquareIcon, Trash2Icon } from "lucide-react";
 import {
-  Button,
   Item,
   ItemActions,
   ItemContent,
   ItemDescription,
   ItemTitle,
-} from "@devboard-interactive/ui";
-import { ComponentProps, useCallback } from "react";
-import { Copy, Flag, PenSquareIcon, Trash2Icon } from "lucide-react";
+} from "@devboard-interactive/ui/item";
 import { Status, TaskDto as TaskModel } from "@/types";
-import { cloneTask, createTask, deleteTask } from "@/server/tasks";
+import { cloneTask, deleteTask } from "@/server/tasks";
 
+import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +57,7 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
   return (
     <Item
       variant="outline"
-      className="bg-card text-card-foreground md:min-w-sm w-full max-w-full md:max-w-sm p-0 items-start flex flex-col justify-between"
+      className="bg-card text-card-foreground md:min-w-sm w-full max-w-full md:max-w-sm p-0 items-start flex flex-col justify-between gap-0"
       {...props}
     >
       <ItemContent className="p-4 w-full">
@@ -73,12 +73,14 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
             {capitalize(task.priority)}
           </span>
         </div>
-        <ItemDescription>{task.description}</ItemDescription>
+        <ItemDescription className="line-clamp-4 h-full">
+          {task.description}
+        </ItemDescription>
 
         {task.labels.length > 0 && <TaskLabels labels={task.labels} />}
       </ItemContent>
 
-      <ItemActions className="mt-4 p-2 border-t w-full flex justify-between items-center">
+      <ItemActions className="p-2 border-t w-full flex justify-between items-center">
         <div>
           <Button variant="ghost" size="sm" onClick={handleEdit}>
             <PenSquareIcon />

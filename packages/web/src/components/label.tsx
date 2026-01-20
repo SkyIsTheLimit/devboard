@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, BadgeProps } from "@devboard-interactive/ui";
+import { Badge, BadgeProps } from "@devboard-interactive/ui/badge";
 
 import { LabelDto } from "@/types";
 

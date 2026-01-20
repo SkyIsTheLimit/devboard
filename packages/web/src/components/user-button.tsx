@@ -9,7 +9,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@devboard-interactive/ui";
+} from "@devboard-interactive/ui/dropdown-menu";
 import { LogOut, Monitor, Moon, Palette, Settings, Sun } from "lucide-react";
 
 import Image from "next/image";

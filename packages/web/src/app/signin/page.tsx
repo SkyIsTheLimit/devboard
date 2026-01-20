@@ -1,4 +1,4 @@
-import { Button } from "@devboard-interactive/ui";
+import { Button } from "@devboard-interactive/ui/button";
 import Image from "next/image";
 import logo from "@/app/logo.png";
 import { signIn } from "@/auth";
