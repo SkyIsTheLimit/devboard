@@ -11,7 +11,7 @@ import {
 import { ComponentProps, useCallback } from "react";
 import { Copy, Flag, PenSquareIcon, Trash2Icon } from "lucide-react";
 import { Status, TaskDto as TaskModel } from "@/types";
-import { createTask, deleteTask } from "@/server/tasks";
+import { cloneTask, createTask, deleteTask } from "@/server/tasks";
 
 import { TaskLabels } from "./labels";
 import { cn } from "@/lib/utils";
@@ -50,7 +50,9 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
 
   const handleDelete = () => deleteTask(task.id);
 
-  const handleClone = () => {};
+  const handleClone = () => {
+    cloneTask(task.id);
+  };
 
   return (
     <Item
@@ -87,7 +89,7 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
             variant="ghost"
             // disabled={!!loading}
             size="sm"
-            // onClick={() => handleDelete(task.id)}
+            onClick={handleClone}
           >
             {/* {!!loading && <Loader />} */}
             <Copy />
@@ -98,7 +100,7 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
           variant="ghost"
           // disabled={!!loading}
           size="sm"
-          onClick={() => handleDelete()}
+          onClick={handleDelete}
         >
           {/* {!!loading && <Loader />} */}
           <Trash2Icon />

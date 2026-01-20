@@ -64,6 +64,39 @@ export async function updateTask(task: UpdateTaskDto) {
   return updatedTask;
 }
 
+export async function cloneTask(taskId: string) {
+  const session = await auth();
+
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  const existingTask = await prisma.task.findUnique({
+    where: {
+      id: taskId,
+      userId: session.user.id,
+    },
+    include: {
+      labels: true,
+    },
+  });
+
+  if (!existingTask) {
+    throw new Error("Task not found");
+  }
+
+  await prisma.task.create({
+    data: {
+      title: existingTask.title,
+      description: existingTask.description,
+      userId: session?.user.id,
+      labels: {
+        connect: existingTask.labels.map((label) => ({ id: label.id })),
+      },
+    },
+  });
+}
+
 export async function deleteTask(taskId: string) {
   const session = await auth();
 

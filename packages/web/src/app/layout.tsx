@@ -2,7 +2,6 @@ import "./globals.css";
 
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { Header } from "@/components/header";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -23,10 +22,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  filter,
 }: Readonly<{
   children: React.ReactNode;
-  filter: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -34,10 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <main className="min-h-screen flex flex-col">
-            <Header>{filter}</Header>
-            {children}
-          </main>
+          <main className="min-h-screen flex flex-col">{children}</main>
         </ThemeProvider>
       </body>
     </html>

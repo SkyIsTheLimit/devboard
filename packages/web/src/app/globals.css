@@ -1,11 +1,8 @@
 @import "tailwindcss";
+@import "../../../ui/base.css";
 
 @plugin "tailwindcss-animate";
 @source "../../../ui/src/**/*.{js,ts,jsx,tsx}";
-
-/* @import "tw-animate-css"; */
-
-/* @custom-variant dark (&:is(.dark *)); */
 
 :root {
   /* --background: oklch(84.522% 0.0001 271.152); */
@@ -188,14 +185,4 @@
 
 body {
   letter-spacing: var(--tracking-normal);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-    letter-spacing: var(--tracking-normal);
-  }
 }
