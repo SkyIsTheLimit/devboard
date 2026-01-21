@@ -1,9 +1,10 @@
 import { defineConfig } from "tsup";
 
-export default defineConfig({
+export default defineConfig((options) => ({
   entry: ["src/**/*.ts", "src/**/*.tsx"],
   format: ["esm", "cjs"],
   dts: true,
   // Watch specific paths (e.g., all TypeScript files in src directory)
-  watch: ["src/**/*.ts", "src/**/*.tsx"],
-});
+  watch: options.watch ? ["src/**/*.ts", "src/**/*.tsx"] : undefined,
+  minify: !options.watch,
+}));
