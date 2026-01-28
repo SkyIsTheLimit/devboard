@@ -1,5 +1,11 @@
 {
   "framework": "nextjs",
   "installCommand": "bash install.sh",
-  "buildCommand": "bash build.sh"
+  "buildCommand": "bash build.sh",
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-tasks",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }

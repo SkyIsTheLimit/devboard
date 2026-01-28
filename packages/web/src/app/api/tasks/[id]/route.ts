@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 
 import { prisma } from "@/lib/prisma";
 
@@ -11,10 +12,18 @@ interface RouteParams {
 // GET /api/tasks/[id] — Get a single task
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
-    const task = await prisma.task.findUnique({
-      where: { id },
+    const task = await prisma.task.findFirst({
+      where: { 
+        id,
+        userId: session.user.id,
+      },
       include: { labels: true },
     });
 
@@ -39,12 +48,22 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PATCH /api/tasks/[id] — Update a task
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { title, description, status, priority, dueDate, labelIds } = body;
 
-    // Check if task exists
-    const existing = await prisma.task.findUnique({ where: { id } });
+    // Check if task exists and belongs to user
+    const existing = await prisma.task.findFirst({ 
+      where: { 
+        id,
+        userId: session.user.id,
+      } 
+    });
     if (!existing) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
@@ -87,9 +106,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/tasks/[id] — Delete a task
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
 
-    const existing = await prisma.task.findUnique({ where: { id } });
+    const existing = await prisma.task.findFirst({ 
+      where: { 
+        id,
+        userId: session.user.id,
+      } 
+    });
     if (!existing) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }

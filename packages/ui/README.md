@@ -13,40 +13,31 @@ A beautiful, accessible React component library built with Tailwind CSS and Radi
 
 ## Installation
 
-This package is part of the DevBoard monorepo. If you're using it in the monorepo:
-
-```bash
-npm install
-```
-
-To use in an external project:
-
 ```bash
 npm install @devboard-interactive/ui
 ```
 
-## Requirements
+## Peer Dependencies
 
-This library requires Tailwind CSS in your project:
+Install these peer dependencies in your project:
 
 ```bash
-npm install tailwindcss
+npm install react react-dom tailwindcss class-variance-authority clsx tailwind-merge tailwindcss-animate tw-animate-css
 ```
 
-Make sure to include the UI package in your Tailwind configuration:
+## Quick Start (Default Theme)
 
-```js
-// tailwind.config.js
-export default {
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@devboard-interactive/ui/**/*.{js,mjs}",
-  ],
-  // ... rest of config
-}
+For instant usage with the default neutral theme, add to your app's global CSS file:
+
+```css
+@import "tailwindcss";
+@import "@devboard-interactive/ui/devboard.css";
+
+@plugin "tailwindcss-animate";
+@source "node_modules/@devboard-interactive/ui/src/**/*.{js,ts,jsx,tsx}";
 ```
 
-## Quick Start
+Then use components:
 
 ```tsx
 import { Button, Card, Badge } from "@devboard-interactive/ui";
@@ -64,6 +55,63 @@ function App() {
     </Card>
   );
 }
+```
+
+That's it! Components will use the default neutral theme with full dark mode support.
+
+## Custom Theme (Advanced)
+
+If you want full control over colors and design tokens, import minimal base styles instead:
+
+```css
+@import "tailwindcss";
+@import "@devboard-interactive/ui/base.css";
+
+@plugin "tailwindcss-animate";
+@source "node_modules/@devboard-interactive/ui/src/**/*.{js,ts,jsx,tsx}";
+
+/* Define your custom theme */
+:root {
+  --background: #ffffff;
+  --foreground: #09090b;
+  --primary: #0070f3;
+  /* ... add all required CSS variables ... */
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  /* ... add dark mode variables ... */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  /* ... map variables to Tailwind ... */
+}
+```
+
+See the `devboard.css` file for the complete list of required CSS variables.
+
+## Tailwind Configuration
+
+Your `tailwind.config.ts`:
+
+```typescript
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  // Content scanning is handled via @source in your CSS file
+  theme: {
+    extend: {
+      // Add your custom theme extensions here
+    },
+  },
+  plugins: [],
+};
+
+export default config;
 ```
 
 ## Components
@@ -375,11 +423,33 @@ This utility uses `clsx` and `tailwind-merge` to intelligently merge class names
 
 ---
 
+## Dark Mode
+
+The library supports dark mode via the `.dark` class. Use `next-themes` or similar:
+
+```tsx
+import { ThemeProvider } from "next-themes";
+
+function App({ children }) {
+  return (
+    <ThemeProvider attribute="class">
+      {children}
+    </ThemeProvider>
+  );
+}
+```
+
+The default theme (devboard.css) includes complete dark mode support. Custom themes should define dark mode variables in the `.dark` selector.
+
+---
+
 ## Development
+
+This package is part of the DevBoard monorepo.
 
 ### Building
 
-Build the package:
+Build the package from monorepo root:
 
 ```bash
 npm run build --workspace=packages/ui
@@ -410,6 +480,23 @@ npm run type-check
 ```bash
 npm run lint
 ```
+
+### Monorepo Setup
+
+For local development in the monorepo:
+
+```bash
+# Install dependencies (from root)
+npm install
+
+# Build UI package
+npm run build --workspace=packages/ui
+
+# Run web app (consumes UI package)
+npm run dev --workspace=packages/web
+```
+
+The web package uses the UI package via workspace dependencies, so changes to UI components are immediately available in development.
 
 ---
 
