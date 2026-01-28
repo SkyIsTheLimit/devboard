@@ -5,7 +5,8 @@
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "devboard.css"
   ],
   "exports": {
     "./devboard.css": "./devboard.css",
