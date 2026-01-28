@@ -21,6 +21,7 @@ model Task {
   status      Status    @default(TODO)
   priority    Priority  @default(MEDIUM)
   dueDate     DateTime?
+  deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   labels      Label[]
@@ -28,6 +29,7 @@ model Task {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([deletedAt])
 }
 
 model Label {

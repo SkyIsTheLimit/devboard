@@ -3,6 +3,7 @@
 import { Status, TaskDto, UpdateTaskDto } from "@/types";
 
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import { withAuth } from "./with-auth";
 
 export const createTask = withAuth(async ({ userId }, formData: FormData) => {
@@ -25,8 +26,9 @@ export const createTask = withAuth(async ({ userId }, formData: FormData) => {
 export const getTasks = withAuth(
   async ({ userId }, status?: Status): Promise<TaskDto[]> => {
     const tasks: TaskDto[] = await prisma.task.findMany({
-      where: { AND: [{ userId }, status ? { status } : {}] },
+      where: { AND: [{ userId }, { deletedAt: null }, status ? { status } : {}] },
       include: { labels: true },
+      orderBy: { updatedAt: "desc" },
     });
 
     return tasks;
@@ -35,7 +37,7 @@ export const getTasks = withAuth(
 
 export const updateTask = withAuth(async ({ userId }, task: UpdateTaskDto) => {
   const updatedTask = await prisma.task.update({
-    where: { id: task.id, userId },
+    where: { id: task.id, userId, deletedAt: null },
     data: {
       ...task,
       labels: task.labelIds
@@ -54,6 +56,7 @@ export const cloneTask = withAuth(async ({ userId }, taskId: string) => {
     where: {
       id: taskId,
       userId,
+      deletedAt: null,
     },
     include: {
       labels: true,
@@ -64,7 +67,7 @@ export const cloneTask = withAuth(async ({ userId }, taskId: string) => {
     throw new Error("Task not found");
   }
 
-  await prisma.task.create({
+  const newTask = await prisma.task.create({
     data: {
       title: existingTask.title,
       description: existingTask.description,
@@ -74,10 +77,33 @@ export const cloneTask = withAuth(async ({ userId }, taskId: string) => {
       },
     },
   });
+
+  revalidatePath("/");
+  return { id: newTask.id, title: newTask.title };
 });
 
 export const deleteTask = withAuth(async ({ userId }, taskId: string) => {
+  await prisma.task.update({
+    where: { id: taskId, userId },
+    data: { deletedAt: new Date() },
+  });
+
+  revalidatePath("/");
+});
+
+export const restoreTask = withAuth(async ({ userId }, taskId: string) => {
+  await prisma.task.update({
+    where: { id: taskId, userId },
+    data: { deletedAt: null },
+  });
+
+  revalidatePath("/");
+});
+
+export const hardDeleteTask = withAuth(async ({ userId }, taskId: string) => {
   await prisma.task.delete({
     where: { id: taskId, userId },
   });
+
+  revalidatePath("/");
 });

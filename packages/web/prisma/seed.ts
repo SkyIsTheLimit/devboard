@@ -1,6 +1,6 @@
 import { Priority } from "@/generated/prisma/enums";
-import { prisma } from "@/lib/prisma";
 import { Status } from "@/types";
+import { prisma } from "@/lib/prisma";
 
 async function main() {
   // Clear existing data so the seed stays idempotent
@@ -41,7 +41,7 @@ async function main() {
   await prisma.label.createMany({ data: labelsData, skipDuplicates: true });
   const labels = await prisma.label.findMany();
   const labelByName = Object.fromEntries(
-    labels.map((label) => [label.name, label])
+    labels.map((label) => [label.name, label]),
   );
 
   const tasksData = [
@@ -133,7 +133,7 @@ async function main() {
   console.log(
     `Seeded ${tasksData.length} tasks across ${labels.length} labels for ${
       [demoUser, otherUser].length
-    } users.`
+    } users.`,
   );
 }
 

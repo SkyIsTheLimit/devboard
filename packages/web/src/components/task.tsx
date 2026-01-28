@@ -1,7 +1,7 @@
 "use client";
 
 import { ComponentProps, useCallback } from "react";
-import { Copy, Flag, PenSquareIcon, Trash2Icon } from "lucide-react";
+import { Copy, Flag, Loader2, PenSquareIcon, Trash2Icon } from "lucide-react";
 import {
   Item,
   ItemActions,
@@ -10,48 +10,46 @@ import {
   ItemTitle,
 } from "@devboard-interactive/ui/item";
 import { Status, TaskDto as TaskModel } from "@/types";
-import { cloneTask, deleteTask } from "@/server/tasks";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
 import { cn } from "@/lib/utils";
 
-export const statusColors: Record<
-  Status,
-  "default" | "info" | "warning" | "success"
-> = {
-  TODO: "default",
-  IN_PROGRESS: "info",
-  IN_REVIEW: "warning",
-  DONE: "success",
-};
-
-export const statusLabels: Record<Status, string> = {
-  TODO: "To Do",
-  IN_PROGRESS: "In Progress",
-  IN_REVIEW: "In Review",
-  DONE: "Done",
-};
-
 export type TaskProps = {
   task: TaskModel;
   onEdit?: (updateTask: TaskModel) => void;
+  onDelete?: (taskId: string) => void;
+  onClone?: (taskId: string) => void;
+  isPending?: boolean;
 } & ComponentProps<typeof Item>;
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
-export function Task({ task, onEdit, ...props }: TaskProps) {
+export function Task({
+  task,
+  onEdit,
+  onDelete,
+  onClone,
+  isPending,
+  ...props
+}: TaskProps) {
   const handleEdit = useCallback(() => {
     if (onEdit) {
       onEdit(task);
     }
   }, [onEdit, task]);
 
-  const handleDelete = () => deleteTask(task.id);
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(task.id);
+    }
+  };
 
   const handleClone = () => {
-    cloneTask(task.id);
+    if (onClone) {
+      onClone(task.id);
+    }
   };
 
   return (
@@ -82,29 +80,34 @@ export function Task({ task, onEdit, ...props }: TaskProps) {
 
       <ItemActions className="p-2 border-t w-full flex justify-between items-center">
         <div>
-          <Button variant="ghost" size="sm" onClick={handleEdit}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleEdit}
+            disabled={isPending}
+          >
             <PenSquareIcon />
             Edit
           </Button>
 
           <Button
             variant="ghost"
-            // disabled={!!loading}
             size="sm"
             onClick={handleClone}
+            disabled={isPending}
           >
-            {/* {!!loading && <Loader />} */}
+            {isPending && <Loader2 className="animate-spin" />}
             <Copy />
             Clone
           </Button>
         </div>
         <Button
           variant="ghost"
-          // disabled={!!loading}
           size="sm"
           onClick={handleDelete}
+          disabled={isPending}
         >
-          {/* {!!loading && <Loader />} */}
+          {isPending && <Loader2 className="animate-spin" />}
           <Trash2Icon />
         </Button>
       </ItemActions>
