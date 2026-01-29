@@ -36,14 +36,15 @@ export const getTasks = withAuth(
 );
 
 export const updateTask = withAuth(async ({ userId }, task: UpdateTaskDto) => {
+  const { labelIds, ...taskData } = task;
   const updatedTask = await prisma.task.update({
     where: { id: task.id, userId, deletedAt: null },
     data: {
-      ...task,
-      labels: task.labelIds
+      ...taskData,
+      labels: labelIds
         ? {
-            set: task.labelIds.map((id) => ({ id })),
-          }
+          set: labelIds.map((id) => ({ id })),
+        }
         : undefined,
     },
   });

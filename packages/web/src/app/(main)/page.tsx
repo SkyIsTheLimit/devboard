@@ -1,8 +1,10 @@
-import { Container } from "@/components/container";
-import { TasksList } from "@/components/task-list";
 import { auth } from "@/auth";
 import { parseSearchForStatus } from "@/components/filter-status";
 import { redirect } from "next/navigation";
+import { getTasks } from "@/server/tasks";
+import { TaskPageWrapper } from "@/components/task-page-wrapper";
+import { Filter } from "@/components/filter";
+import { searchList } from "@/components/filter-status";
 
 export default async function Home({
   searchParams: searchParamsPromise,
@@ -15,10 +17,13 @@ export default async function Home({
   if (!session) redirect("/signin");
 
   const searchItem = parseSearchForStatus(searchParams.status?.toString());
+  const tasks = await getTasks(searchItem.status);
 
   return (
-    <Container className="flex-1 py-4 w-full">
-      <TasksList status={searchItem.status} />
-    </Container>
+    <TaskPageWrapper
+      tasks={tasks}
+      user={session.user}
+      filter={<Filter activeItem={searchItem} searchList={searchList} />}
+    />
   );
 }

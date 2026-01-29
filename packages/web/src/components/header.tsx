@@ -2,12 +2,16 @@ import { Container } from "./container";
 import Image from "next/image";
 import Link from "next/link";
 import { UserButton } from "./user-button";
-import { auth } from "@/auth";
 import header from "../app/header.png";
+import { auth } from "@/auth";
 
-export async function Header({ children }: { children?: React.ReactNode }) {
+interface HeaderProps {
+  children?: React.ReactNode;
+}
+
+export async function Header({ children }: HeaderProps) {
   const session = await auth();
-
+  
   return (
     <div className="sticky top-0 z-10 dark dark:bg-neutral-900 text-white">
       <div className="border-b py-8 ">
@@ -18,7 +22,7 @@ export async function Header({ children }: { children?: React.ReactNode }) {
               <h1 className="text-lg font-bold">DevBoard</h1>
             </div>
           </Link>
-          {session?.user && <UserButton user={session.user} />}
+            {session?.user && <UserButton user={session.user} />}
         </Container>
       </div>
 
