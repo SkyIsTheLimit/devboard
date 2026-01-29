@@ -6,14 +6,28 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Task } from "./task";
 import { TaskDto } from "@/types";
 import { toast } from "sonner";
+import { TaskCreateDialog } from "./task-create-dialog";
+import { TaskEditSheet } from "./task-edit-sheet";
 
 const UNDO_DURATION = 6000;
 
-export function TasksListClient({ tasks }: { tasks: TaskDto[] }) {
+export function TasksListClient({
+  tasks,
+  isCreateOpen,
+  onCreateOpenChange,
+}: {
+  tasks: TaskDto[];
+  isCreateOpen: boolean;
+  onCreateOpenChange: (open: boolean) => void;
+}) {
   // Track pending deletes (task IDs that are optimistically removed but can be undone)
   const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set());
   // Track pending clones (temp tasks shown optimistically before server confirms)
   const [pendingClones, setPendingClones] = useState<TaskDto[]>([]);
+
+  // Sheet state for editing
+  const [editingTask, setEditingTask] = useState<TaskDto | null>(null);
+  const isEditOpen = editingTask !== null;
 
   // Map of taskId -> { toastId, clonedTaskId } for undo tracking
   const undoState = useRef<Map<string, { toastId: string | number; clonedTaskId?: string }>>(new Map());
@@ -164,16 +178,33 @@ export function TasksListClient({ tasks }: { tasks: TaskDto[] }) {
     [tasks],
   );
 
+  const handleEdit = useCallback((task: TaskDto) => {
+    setEditingTask(task);
+  }, []);
+
   return (
-    <div className="flex gap-4 flex-wrap p-1 w-full">
-      {visibleTasks.map((task) => (
-        <Task
-          key={task.id}
-          task={task}
-          onDelete={handleDelete}
-          onClone={handleClone}
-        />
-      ))}
-    </div>
+    <>
+      <div className="flex gap-4 flex-wrap p-1 w-full">
+        {visibleTasks.map((task) => (
+          <Task
+            key={task.id}
+            task={task}
+            onDelete={handleDelete}
+            onClone={handleClone}
+            onEdit={handleEdit}
+          />
+        ))}
+      </div>
+
+      <TaskCreateDialog open={isCreateOpen} onOpenChange={onCreateOpenChange} />
+
+      <TaskEditSheet
+        task={editingTask}
+        open={isEditOpen}
+        onOpenChange={(open) => {
+          if (!open) setEditingTask(null);
+        }}
+      />
+    </>
   );
 }
