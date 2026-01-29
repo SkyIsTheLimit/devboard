@@ -17,8 +17,8 @@ import { Button } from "@devboard-interactive/ui/button";
 import { useRouter } from "next/navigation";
 
 interface TaskCreateDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function TaskCreateDialog({ open, onOpenChange }: TaskCreateDialogProps) {
@@ -30,7 +30,7 @@ export function TaskCreateDialog({ open, onOpenChange }: TaskCreateDialogProps) 
       description: "",
     },
     validators: {
-      onChange: taskCreateSchema,
+      // onChange: taskCreateSchema,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -41,7 +41,7 @@ export function TaskCreateDialog({ open, onOpenChange }: TaskCreateDialogProps) 
         await createTask(formData);
 
         toast.success("Task created successfully");
-        onOpenChange(false);
+        onOpenChange?.(false);
         form.reset();
         router.refresh();
       } catch (error) {
@@ -107,7 +107,7 @@ export function TaskCreateDialog({ open, onOpenChange }: TaskCreateDialogProps) 
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => onOpenChange?.(false)}
             >
               Cancel
             </Button>

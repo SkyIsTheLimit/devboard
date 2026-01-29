@@ -17,8 +17,8 @@ export function TasksListClient({
   onCreateOpenChange,
 }: {
   tasks: TaskDto[];
-  isCreateOpen: boolean;
-  onCreateOpenChange: (open: boolean) => void;
+  isCreateOpen?: boolean;
+  onCreateOpenChange?: (open: boolean) => void;
 }) {
   // Track pending deletes (task IDs that are optimistically removed but can be undone)
   const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set());
