@@ -60,12 +60,13 @@ export function TasksListClient({
     ...tasks.filter((task) => !pendingDeletes.has(task.id)),
   ];
 
+  // Optimization: handleDelete and handleClone no longer depend on [tasks]
+  // This makes them stable references, preventing Task components from re-rendering
+  // when the list changes (e.g. optimistic updates).
   const handleDelete = useCallback(
-    async (taskId: string) => {
-      const originalTask = tasks.find((t) => t.id === taskId);
-      if (!originalTask) return;
-
-      const taskTitle = originalTask.title;
+    async (task: TaskDto) => {
+      const taskId = task.id;
+      const taskTitle = task.title;
 
       // Dismiss any existing toast for this task
       const existing = undoState.current.get(taskId);
@@ -117,20 +118,18 @@ export function TasksListClient({
 
       undoState.current.set(taskId, { toastId });
     },
-    [tasks],
+    [],
   );
 
   const handleClone = useCallback(
-    async (taskId: string) => {
-      const originalTask = tasks.find((t) => t.id === taskId);
-      if (!originalTask) return;
-
+    async (task: TaskDto) => {
+      const taskId = task.id;
       const opKey = `clone-${taskId}`;
       const tempId = `temp-${Date.now()}`;
 
       // Create temporary cloned task for optimistic UI
       const tempTask: TaskDto = {
-        ...originalTask,
+        ...task,
         id: tempId,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -149,12 +148,12 @@ export function TasksListClient({
       } catch {
         // Remove temp task on failure
         setPendingClones((prev) => prev.filter((t) => t.id !== tempId));
-        toast.error(`Failed to clone "${originalTask.title}"`);
+        toast.error(`Failed to clone "${task.title}"`);
         return;
       }
 
       // Show toast with undo option
-      const toastId = toast.success(`Cloned "${originalTask.title}"`, {
+      const toastId = toast.success(`Cloned "${task.title}"`, {
         duration: UNDO_DURATION,
         action: {
           label: "Undo",
@@ -175,7 +174,7 @@ export function TasksListClient({
 
       undoState.current.set(opKey, { toastId, clonedTaskId });
     },
-    [tasks],
+    [],
   );
 
   const handleEdit = useCallback((task: TaskDto) => {
