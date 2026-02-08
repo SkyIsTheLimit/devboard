@@ -66,6 +66,8 @@ export function TasksListClient({
   const handleDelete = useCallback(
     async (task: TaskDto) => {
       const taskId = task.id;
+      if (taskId.startsWith("temp-")) return;
+
       const taskTitle = task.title;
 
       // Dismiss any existing toast for this task
@@ -124,6 +126,8 @@ export function TasksListClient({
   const handleClone = useCallback(
     async (task: TaskDto) => {
       const taskId = task.id;
+      if (taskId.startsWith("temp-")) return;
+
       const opKey = `clone-${taskId}`;
       const tempId = `temp-${Date.now()}`;
 
