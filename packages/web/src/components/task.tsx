@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentProps, useCallback } from "react";
+import { ComponentProps, memo, useCallback } from "react";
 import { Copy, Flag, Loader2, PenSquareIcon, Trash2Icon } from "lucide-react";
 import {
   Item,
@@ -18,15 +18,17 @@ import { cn } from "@/lib/utils";
 export type TaskProps = {
   task: TaskModel;
   onEdit?: (updateTask: TaskModel) => void;
-  onDelete?: (taskId: string) => void;
-  onClone?: (taskId: string) => void;
+  onDelete?: (task: TaskModel) => void;
+  onClone?: (task: TaskModel) => void;
   isPending?: boolean;
 } & ComponentProps<typeof Item>;
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
-export function Task({
+// Memoized to prevent re-renders when parent state (like optimistic deletes) changes
+// but this specific task hasn't changed.
+export const Task = memo(function Task({
   task,
   onEdit,
   onDelete,
@@ -42,13 +44,13 @@ export function Task({
 
   const handleDelete = () => {
     if (onDelete) {
-      onDelete(task.id);
+      onDelete(task);
     }
   };
 
   const handleClone = () => {
     if (onClone) {
-      onClone(task.id);
+      onClone(task);
     }
   };
 
@@ -113,4 +115,4 @@ export function Task({
       </ItemActions>
     </Item>
   );
-}
+});
