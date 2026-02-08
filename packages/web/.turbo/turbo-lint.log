@@ -1,0 +1,21 @@
+
+> @devboard-interactive/web@0.1.0 lint
+> eslint
+
+
+/app/packages/web/src/components/task-create-dialog.tsx
+  6:10  warning  'taskCreateSchema' is defined but never used  @typescript-eslint/no-unused-vars
+
+/app/packages/web/src/components/task-edit-sheet.tsx
+   92:6   warning  React Hook useEffect has missing dependencies: 'form' and 'task'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  133:15  warning  'fieldLabels' is assigned a value but never used                                                                      @typescript-eslint/no-unused-vars
+
+/app/packages/web/src/components/task-page-wrapper.tsx
+   5:10  warning  'Header' is defined but never used  @typescript-eslint/no-unused-vars
+  21:42  warning  'user' is defined but never used    @typescript-eslint/no-unused-vars
+  21:48  warning  'filter' is defined but never used  @typescript-eslint/no-unused-vars
+
+/app/packages/web/src/components/task.tsx
+  12:10  warning  'Status' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 7 problems (0 errors, 7 warnings)
