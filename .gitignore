@@ -42,4 +42,6 @@ coverage/
 .vercel
 .env*.local
 
-.turbo/*
+# Turbo
+.turbo/
+**/.turbo/
