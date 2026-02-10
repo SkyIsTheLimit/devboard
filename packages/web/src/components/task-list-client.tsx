@@ -1,7 +1,7 @@
 "use client";
 
 import { cloneTask, deleteTask, hardDeleteTask, restoreTask } from "@/server/tasks";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Task } from "./task";
 import { TaskDto } from "@/types";
@@ -77,10 +77,15 @@ export function TasksListClient({
   }, [tasks]);
 
   // Derived state: visible tasks = props - pending deletes + pending clones
-  const visibleTasks = [
-    ...pendingClones,
-    ...tasks.filter((task) => !pendingDeletes.has(task.id)),
-  ];
+  // Memoized to prevent O(N) filtering on every render (e.g. when opening edit sheet),
+  // improving performance especially with large task lists.
+  const visibleTasks = useMemo(
+    () => [
+      ...pendingClones,
+      ...tasks.filter((task) => !pendingDeletes.has(task.id)),
+    ],
+    [pendingClones, tasks, pendingDeletes],
+  );
 
   // Optimization: handleDelete and handleClone no longer depend on [tasks]
   // This makes them stable references, preventing Task components from re-rendering
