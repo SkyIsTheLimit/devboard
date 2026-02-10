@@ -1,4 +1,6 @@
 #!/bin/bash
 set -e
 
-[ "$VERCEL_ENV" = "production" ] && npm install --no-workspaces || (cd ../.. && npm install)
+# Always install dependencies from root (monorepo structure)
+cd ../..
+npm ci

@@ -18,8 +18,8 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
     "@devboard-interactive/ui": "*",
-    "@prisma/adapter-pg": "^7.0.1",
-    "@prisma/client": "^7.0.1",
+    "@prisma/adapter-pg": "7.3.0",
+    "@prisma/client": "7.3.0",
     "@sentry/nextjs": "^10.29.0",
     "@tanstack/react-form": "^1.27.7",
     "class-variance-authority": "^0.7.1",
@@ -45,7 +45,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "^16.1.1",
-    "prisma": "^7.0.1",
+    "prisma": "7.3.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
