@@ -1,6 +1,6 @@
 {
   "name": "@devboard-interactive/ui",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "React component library for the DevBoard application.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
