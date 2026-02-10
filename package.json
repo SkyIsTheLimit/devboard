@@ -11,7 +11,7 @@
         "lint": "npm run lint --workspaces --if-present",
         "test": "npm run test --workspaces --if-present",
         "type-check": "npm run type-check --workspaces --if-present",
-        "release": "turbo run build --filter=packages/ui && changeset publish"
+        "release": "turbo run build --filter=@devboard-interactive/ui && changeset publish"
     },
     "devDependencies": {
         "@changesets/cli": "^2.29.8",
