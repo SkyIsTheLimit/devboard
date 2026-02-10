@@ -1,7 +1,7 @@
 "use client";
 
 import { cloneTask, deleteTask, hardDeleteTask, restoreTask } from "@/server/tasks";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 
 import { Task } from "./task";
 import { TaskDto } from "@/types";
@@ -84,7 +84,7 @@ export function TasksListClient({
       ...pendingClones,
       ...tasks.filter((task) => !pendingDeletes.has(task.id)),
     ],
-    [pendingClones, tasks, pendingDeletes],
+    [pendingClones, tasks, pendingDeletes]
   );
 
   // Optimization: handleDelete and handleClone no longer depend on [tasks]
