@@ -3,7 +3,6 @@
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { updateTask } from "@/server/tasks";
-import { getLabels } from "@/server/labels";
 import { TaskDto, LabelDto, Status, Priority } from "@/types";
 import {
   Sheet,
@@ -44,15 +43,16 @@ import { format } from "date-fns";
 
 interface TaskEditSheetProps {
   task: TaskDto | null;
+  initialLabels: LabelDto[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave?: () => void;
 }
 
-export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditSheetProps) {
+export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave }: TaskEditSheetProps) {
   const router = useRouter();
   const [savingField, setSavingField] = useState<string | null>(null);
-  const [availableLabels, setAvailableLabels] = useState<LabelDto[]>([]);
+  const availableLabels = initialLabels;
   const [labelsOpen, setLabelsOpen] = useState(false);
 
   const form = useForm({
@@ -65,19 +65,6 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
       labelIds: task?.labels?.map((l) => l.id) || [],
     },
   });
-
-  // Fetch available labels on mount
-  useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        const labels = await getLabels();
-        setAvailableLabels(labels);
-      } catch (error) {
-        console.error("Failed to fetch labels:", error);
-      }
-    };
-    fetchLabels();
-  }, []);
 
   // Reset form when task changes
   useEffect(() => {
