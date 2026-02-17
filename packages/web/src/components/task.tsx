@@ -26,6 +26,39 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+const areTaskPropsEqual = (prev: TaskProps, next: TaskProps) => {
+  // If the task object is the same reference, no need to check further
+  if (
+    prev.task === next.task &&
+    prev.isPending === next.isPending &&
+    prev.onEdit === next.onEdit &&
+    prev.onDelete === next.onDelete &&
+    prev.onClone === next.onClone
+  ) {
+    return true;
+  }
+
+  // Check if updatedAt is the same (handling potential string serialization)
+  const prevTime =
+    prev.task.updatedAt instanceof Date
+      ? prev.task.updatedAt.getTime()
+      : new Date(prev.task.updatedAt).getTime();
+
+  const nextTime =
+    next.task.updatedAt instanceof Date
+      ? next.task.updatedAt.getTime()
+      : new Date(next.task.updatedAt).getTime();
+
+  return (
+    prev.task.id === next.task.id &&
+    prevTime === nextTime &&
+    prev.isPending === next.isPending &&
+    prev.onEdit === next.onEdit &&
+    prev.onDelete === next.onDelete &&
+    prev.onClone === next.onClone
+  );
+};
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +148,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
