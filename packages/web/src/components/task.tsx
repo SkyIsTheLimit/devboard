@@ -26,6 +26,54 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+const arePropsEqual = (prevProps: TaskProps, nextProps: TaskProps) => {
+  const prevTask = prevProps.task;
+  const nextTask = nextProps.task;
+
+  // Check core properties
+  if (
+    prevTask.id !== nextTask.id ||
+    prevTask.title !== nextTask.title ||
+    prevTask.description !== nextTask.description ||
+    prevTask.status !== nextTask.status ||
+    prevTask.priority !== nextTask.priority ||
+    prevTask.userId !== nextTask.userId
+  ) {
+    return false;
+  }
+
+  // Check date fields
+  const prevUpdated = new Date(prevTask.updatedAt).getTime();
+  const nextUpdated = new Date(nextTask.updatedAt).getTime();
+  if (prevUpdated !== nextUpdated) return false;
+
+  const prevDue = prevTask.dueDate ? new Date(prevTask.dueDate).getTime() : null;
+  const nextDue = nextTask.dueDate ? new Date(nextTask.dueDate).getTime() : null;
+  if (prevDue !== nextDue) return false;
+
+  // Check labels deep equality
+  if (prevTask.labels.length !== nextTask.labels.length) return false;
+  for (let i = 0; i < prevTask.labels.length; i++) {
+    const l1 = prevTask.labels[i];
+    const l2 = nextTask.labels[i];
+    if (l1.id !== l2.id || l1.name !== l2.name || l1.color !== l2.color) {
+      return false;
+    }
+  }
+
+  // Check callbacks and other props
+  if (
+    prevProps.onEdit !== nextProps.onEdit ||
+    prevProps.onDelete !== nextProps.onDelete ||
+    prevProps.onClone !== nextProps.onClone ||
+    prevProps.isPending !== nextProps.isPending
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +163,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, arePropsEqual);
