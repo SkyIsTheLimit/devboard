@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -26,8 +26,55 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // Check primitive props and handlers
+  if (
+    prev.isPending !== next.isPending ||
+    prev.onEdit !== next.onEdit ||
+    prev.onDelete !== next.onDelete ||
+    prev.onClone !== next.onClone
+  ) {
+    return false;
+  }
+
+  // Check task object identity/version
+  const prevTask = prev.task;
+  const nextTask = next.task;
+
+  if (prevTask.id !== nextTask.id) return false;
+
+  // Tasks are referentially different on every server fetch, but we only want to re-render
+  // if the task data has actually changed. We use updatedAt as a version check.
+  if (new Date(prevTask.updatedAt).getTime() !== new Date(nextTask.updatedAt).getTime()) return false;
+
+  // Labels are a relation and might change. We check deep equality for labels.
+  if (prevTask.labels.length !== nextTask.labels.length) return false;
+
+  for (let i = 0; i < prevTask.labels.length; i++) {
+    const pLabel = prevTask.labels[i];
+    const nLabel = nextTask.labels[i];
+    if (
+        pLabel.id !== nLabel.id ||
+        pLabel.name !== nLabel.name ||
+        pLabel.color !== nLabel.color
+    ) return false;
+  }
+
+  // Check remaining props (shallow comparison for things like className, style, etc.)
+  const prevKeys = Object.keys(prev);
+  const nextKeys = Object.keys(next);
+  if (prevKeys.length !== nextKeys.length) return false;
+
+  for (const key of prevKeys) {
+    if (key === 'task' || key === 'onEdit' || key === 'onDelete' || key === 'onClone' || key === 'isPending') continue;
+    if (prev[key as keyof TaskProps] !== next[key as keyof TaskProps]) return false;
+  }
+
+  return true;
+}
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
-// but this specific task hasn't changed.
+// or when server revalidates data but this specific task hasn't changed.
 export const Task = memo(function Task({
   task,
   onEdit,
@@ -115,4 +162,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
