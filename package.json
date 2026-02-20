@@ -6,6 +6,7 @@
         "packages/*"
     ],
     "scripts": {
+        "postinstall": "node scripts/patch-minimatch.mjs",
         "dev": "npm run dev --workspace=packages/web",
         "build": "npm run build --workspaces",
         "lint": "npm run lint --workspaces --if-present",
@@ -17,5 +18,8 @@
         "@changesets/cli": "^2.29.8",
         "turbo": "^2.8.3"
     },
-    "packageManager": "npm@11.7.0"
+    "packageManager": "npm@11.7.0",
+    "overrides": {
+        "minimatch": "10.2.1"
+    }
 }
