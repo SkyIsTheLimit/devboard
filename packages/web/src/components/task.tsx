@@ -26,6 +26,66 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+function arePropsEqual(prev: TaskProps, next: TaskProps) {
+  const { task: prevTask, ...prevRest } = prev;
+  const { task: nextTask, ...nextRest } = next;
+
+  // Shallow compare rest props
+  const prevRestKeys = Object.keys(prevRest) as (keyof typeof prevRest)[];
+  const nextRestKeys = Object.keys(nextRest) as (keyof typeof nextRest)[];
+
+  if (prevRestKeys.length !== nextRestKeys.length) return false;
+  for (const key of prevRestKeys) {
+    if (prevRest[key] !== nextRest[key]) {
+      return false;
+    }
+  }
+
+  // Check task identity (fast path)
+  if (prevTask === nextTask) return true;
+
+  // Deep compare task
+  const prevKeys = Object.keys(prevTask) as (keyof typeof prevTask)[];
+  const nextKeys = Object.keys(nextTask) as (keyof typeof nextTask)[];
+
+  if (prevKeys.length !== nextKeys.length) return false;
+
+  for (const key of prevKeys) {
+    const val1 = prevTask[key];
+    const val2 = nextTask[key];
+
+    if (val1 === val2) continue;
+    if (!Object.prototype.hasOwnProperty.call(nextTask, key)) return false;
+
+    // Special handling for labels
+    if (key === "labels" && Array.isArray(val1) && Array.isArray(val2)) {
+      if (val1.length !== val2.length) return false;
+      for (let i = 0; i < val1.length; i++) {
+        const l1 = val1[i];
+        const l2 = val2[i];
+        if (
+          l1.id !== l2.id ||
+          l1.name !== l2.name ||
+          l1.color !== l2.color
+        ) {
+          return false;
+        }
+      }
+      continue;
+    }
+
+    // Dates
+    if (val1 instanceof Date && val2 instanceof Date) {
+      if (val1.getTime() !== val2.getTime()) return false;
+      continue;
+    }
+
+    return false;
+  }
+
+  return true;
+}
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +175,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, arePropsEqual);
