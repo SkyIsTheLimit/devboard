@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,64 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+const areTaskPropsEqual = (prevProps: TaskProps, nextProps: TaskProps) => {
+  // Check if handlers and simple props changed
+  if (
+    prevProps.isPending !== nextProps.isPending ||
+    prevProps.onEdit !== nextProps.onEdit ||
+    prevProps.onDelete !== nextProps.onDelete ||
+    prevProps.onClone !== nextProps.onClone
+  ) {
+    return false;
+  }
+
+  const prevTask = prevProps.task;
+  const nextTask = nextProps.task;
+
+  // Check ID
+  if (prevTask.id !== nextTask.id) return false;
+
+  // Check simple fields
+  if (prevTask.title !== nextTask.title) return false;
+  if (prevTask.description !== nextTask.description) return false;
+  if (prevTask.status !== nextTask.status) return false;
+  if (prevTask.priority !== nextTask.priority) return false;
+
+  // Check timestamps safely (handles Date object vs string serialization)
+  const prevUpdatedAt = new Date(prevTask.updatedAt).getTime();
+  const nextUpdatedAt = new Date(nextTask.updatedAt).getTime();
+  if (prevUpdatedAt !== nextUpdatedAt) return false;
+
+  const prevDueDate = prevTask.dueDate
+    ? new Date(prevTask.dueDate).getTime()
+    : 0;
+  const nextDueDate = nextTask.dueDate
+    ? new Date(nextTask.dueDate).getTime()
+    : 0;
+  if (prevDueDate !== nextDueDate) return false;
+
+  // Check labels structure just in case (e.g. relation update without task timestamp update)
+  if (prevTask.labels.length !== nextTask.labels.length) return false;
+
+  // Deep compare sorted labels
+  const prevLabels = [...prevTask.labels].sort((a, b) =>
+    a.id.localeCompare(b.id),
+  );
+  const nextLabels = [...nextTask.labels].sort((a, b) =>
+    a.id.localeCompare(b.id),
+  );
+
+  for (let i = 0; i < prevLabels.length; i++) {
+    const l1 = prevLabels[i];
+    const l2 = nextLabels[i];
+    if (l1.id !== l2.id || l1.name !== l2.name || l1.color !== l2.color) {
+      return false;
+    }
+  }
+
+  return true;
+};
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +173,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
