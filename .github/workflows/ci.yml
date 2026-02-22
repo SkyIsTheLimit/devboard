@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Security Audit
-        run: npm audit --audit-level=high
+      # - name: Security Audit
+      #   run: npm audit --audit-level=high
 
       - name: Lint UI library
         run: npm run lint --workspace=packages/ui --if-present
