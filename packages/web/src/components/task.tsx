@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -28,6 +28,80 @@ const capitalize = (s: string) =>
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
+// Also implements custom comparison to handle new object references from server with same content.
+const areTaskPropsEqual = (prevProps: TaskProps, nextProps: TaskProps) => {
+  // 1. Check handlers (should be stable, but good to check)
+  if (
+    prevProps.onEdit !== nextProps.onEdit ||
+    prevProps.onDelete !== nextProps.onDelete ||
+    prevProps.onClone !== nextProps.onClone ||
+    prevProps.isPending !== nextProps.isPending
+  ) {
+    return false;
+  }
+
+  // 2. Check task object
+  const prev = prevProps.task;
+  const next = nextProps.task;
+
+  if (prev === next) return true; // Reference equality shortcut
+
+  // Primitive fields
+  if (
+    prev.id !== next.id ||
+    prev.title !== next.title ||
+    prev.description !== next.description ||
+    prev.status !== next.status ||
+    prev.priority !== next.priority
+  ) {
+    return false;
+  }
+
+  // Date fields (handle string vs Date)
+  const getTime = (d: Date | string | null | undefined) =>
+    d ? new Date(d).getTime() : 0;
+
+  if (getTime(prev.updatedAt) !== getTime(next.updatedAt)) return false;
+  if (getTime(prev.dueDate) !== getTime(next.dueDate)) return false;
+
+  // Labels
+  if (prev.labels.length !== next.labels.length) return false;
+
+  // Deep compare labels (assuming order matters or is consistent)
+  // We use a loop for performance instead of sort
+  for (let i = 0; i < prev.labels.length; i++) {
+    const l1 = prev.labels[i];
+    const l2 = next.labels[i];
+    if (l1.id !== l2.id || l1.name !== l2.name || l1.color !== l2.color) {
+      return false;
+    }
+  }
+
+  // 3. Check other props (shallow) - passed to Item
+  // We exclude known props that we already checked
+  const allKeys = new Set([
+    ...Object.keys(prevProps),
+    ...Object.keys(nextProps),
+  ]);
+  for (const key of allKeys) {
+    if (
+      key === "task" ||
+      key === "onEdit" ||
+      key === "onDelete" ||
+      key === "onClone" ||
+      key === "isPending"
+    )
+      continue;
+    if (
+      prevProps[key as keyof TaskProps] !== nextProps[key as keyof TaskProps]
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 export const Task = memo(function Task({
   task,
   onEdit,
@@ -115,4 +189,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
