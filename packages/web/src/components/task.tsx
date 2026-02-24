@@ -26,6 +26,73 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // Check if callbacks changed (they should be stable, but good to check)
+  if (
+    prev.onEdit !== next.onEdit ||
+    prev.onDelete !== next.onDelete ||
+    prev.onClone !== next.onClone ||
+    prev.isPending !== next.isPending
+  ) {
+    return false;
+  }
+
+  const p = prev.task;
+  const n = next.task;
+
+  // Fast path for reference equality
+  if (p === n) return true;
+
+  // Check unique ID first
+  if (p.id !== n.id) return false;
+
+  // Check primitive fields to ensure UI reflects optimistic updates.
+  // Note: We check these manually because updatedAt might not be updated immediately in optimistic updates.
+  // If you add a new visible field to TaskDto, you MUST update this check!
+  if (
+    p.title !== n.title ||
+    p.description !== n.description ||
+    p.status !== n.status ||
+    p.priority !== n.priority
+  ) {
+    return false;
+  }
+
+  // Check Dates (serialize to timestamp to handle Date vs string)
+  const getTime = (d: Date | string | null | undefined) => {
+    if (!d) return 0;
+    if (d instanceof Date) return d.getTime();
+    return new Date(d).getTime();
+  };
+
+  if (getTime(p.updatedAt) !== getTime(n.updatedAt)) {
+    return false;
+  }
+
+  if (getTime(p.dueDate) !== getTime(n.dueDate)) {
+    return false;
+  }
+
+  // Check Labels (deep check for content changes like renamed labels)
+  if (p.labels.length !== n.labels.length) {
+    return false;
+  }
+
+  // Sort labels by ID for consistent comparison
+  const pLabels = [...p.labels].sort((a, b) => a.id.localeCompare(b.id));
+  const nLabels = [...n.labels].sort((a, b) => a.id.localeCompare(b.id));
+
+  for (let i = 0; i < pLabels.length; i++) {
+    const l1 = pLabels[i];
+    const l2 = nLabels[i];
+    if (l1.id !== l2.id || l1.name !== l2.name || l1.color !== l2.color) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +182,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
