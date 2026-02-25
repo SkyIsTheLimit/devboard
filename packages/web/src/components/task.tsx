@@ -27,34 +27,10 @@ const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
 function areTaskPropsEqual(prevProps: TaskProps, nextProps: TaskProps) {
-  // Check simple props (functions are stable via useCallback usually, but strict check is good)
-  if (
-    prevProps.isPending !== nextProps.isPending ||
-    prevProps.onEdit !== nextProps.onEdit ||
-    prevProps.onDelete !== nextProps.onDelete ||
-    prevProps.onClone !== nextProps.onClone
-  ) {
-    return false;
-  }
+  const { task: prevTask, ...prevRest } = prevProps;
+  const { task: nextTask, ...nextRest } = nextProps;
 
-  // Compare other props (passed to Item) - shallow compare
-  const {
-    task: pt,
-    onEdit: pe,
-    onDelete: pd,
-    onClone: pc,
-    isPending: pp,
-    ...prevRest
-  } = prevProps;
-  const {
-    task: nt,
-    onEdit: ne,
-    onDelete: nd,
-    onClone: nc,
-    isPending: np,
-    ...nextRest
-  } = nextProps;
-
+  // 1. Shallow compare non-task props (handlers, isPending, etc.)
   const prevKeys = Object.keys(prevRest);
   const nextKeys = Object.keys(nextRest);
   if (prevKeys.length !== nextKeys.length) return false;
@@ -63,28 +39,30 @@ function areTaskPropsEqual(prevProps: TaskProps, nextProps: TaskProps) {
     if (
       prevRest[key as keyof typeof prevRest] !==
       nextRest[key as keyof typeof nextRest]
-    )
+    ) {
       return false;
+    }
   }
 
-  const prevTask = prevProps.task;
-  const nextTask = nextProps.task;
-
-  if (prevTask === nextTask) {
-    return true;
-  }
-
-  // Optimized comparison: check ID and updatedAt.
-  // If updatedAt is the same, we assume the task data (including relations like labels) hasn't changed.
-  // This avoids deep comparison of all fields and arrays.
-  if (prevTask.id !== nextTask.id) {
+  // 2. Compare Task Identity and Version
+  if (prevTask.id !== nextTask.id) return false;
+  if (
+    new Date(prevTask.updatedAt).getTime() !==
+    new Date(nextTask.updatedAt).getTime()
+  )
     return false;
+
+  // 3. Compare Labels (Edge case: Label renaming doesn't touch Task updatedAt)
+  if (prevTask.labels.length !== nextTask.labels.length) return false;
+  for (let i = 0; i < prevTask.labels.length; i++) {
+    const p = prevTask.labels[i];
+    const n = nextTask.labels[i];
+    if (p.id !== n.id || p.name !== n.name || p.color !== n.color) {
+      return false;
+    }
   }
 
-  const prevUpdated = new Date(prevTask.updatedAt).getTime();
-  const nextUpdated = new Date(nextTask.updatedAt).getTime();
-
-  return prevUpdated === nextUpdated;
+  return true;
 }
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
