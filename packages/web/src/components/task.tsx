@@ -26,6 +26,50 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // Check if props are shallowly equal (except task)
+  const prevKeys = Object.keys(prev) as (keyof TaskProps)[];
+  const nextKeys = Object.keys(next) as (keyof TaskProps)[];
+
+  if (prevKeys.length !== nextKeys.length) return false;
+
+  for (const key of prevKeys) {
+    if (key === "task") continue;
+    if (prev[key] !== next[key]) return false;
+  }
+
+  // Deep check task
+  const prevTask = prev.task;
+  const nextTask = next.task;
+
+  // 1. Fast path: Reference equality
+  if (prevTask === nextTask) return true;
+
+  // 2. Identity
+  if (prevTask.id !== nextTask.id) return false;
+
+  // 3. Timestamps (handles Date objects and ISO strings)
+  const prevTime = new Date(prevTask.updatedAt).getTime();
+  const nextTime = new Date(nextTask.updatedAt).getTime();
+  if (prevTime !== nextTime) return false;
+
+  // 4. Labels (relations might not update task timestamp)
+  if (prevTask.labels.length !== nextTask.labels.length) return false;
+
+  const prevLabelIds = prevTask.labels
+    .map((l) => l.id)
+    .sort()
+    .join(",");
+  const nextLabelIds = nextTask.labels
+    .map((l) => l.id)
+    .sort()
+    .join(",");
+
+  if (prevLabelIds !== nextLabelIds) return false;
+
+  return true;
+}
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +159,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
