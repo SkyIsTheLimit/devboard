@@ -26,6 +26,58 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // 1. Fast path: Reference equality for non-task props
+  if (
+    prev.isPending !== next.isPending ||
+    prev.onEdit !== next.onEdit ||
+    prev.onDelete !== next.onDelete ||
+    prev.onClone !== next.onClone
+  ) {
+    return false;
+  }
+
+  // 2. Fast path: Reference equality for task object
+  if (prev.task === next.task) {
+    return true;
+  }
+
+  // 3. Deep check for task content changes
+  // We manually check fields to avoid re-renders when the object reference changes but content doesn't.
+  // This is critical for performance when the parent component re-renders.
+  if (
+    prev.task.id !== next.task.id ||
+    prev.task.title !== next.task.title ||
+    prev.task.description !== next.task.description ||
+    prev.task.status !== next.task.status ||
+    prev.task.priority !== next.task.priority ||
+    prev.task.dueDate !== next.task.dueDate
+  ) {
+    return false;
+  }
+
+  // 4. Labels check
+  // Labels are an array of objects, so reference equality often fails even if content is same.
+  // We check length and IDs in order.
+  if (prev.task.labels.length !== next.task.labels.length) {
+    return false;
+  }
+
+  for (let i = 0; i < prev.task.labels.length; i++) {
+    const prevLabel = prev.task.labels[i];
+    const nextLabel = next.task.labels[i];
+    if (
+      prevLabel.id !== nextLabel.id ||
+      prevLabel.name !== nextLabel.name ||
+      prevLabel.color !== nextLabel.color
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +167,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
