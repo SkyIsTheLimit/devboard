@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,60 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+function areTaskPropsEqual(prevProps: TaskProps, nextProps: TaskProps) {
+  // 1. Shallow comparison of non-task props
+  if (
+    prevProps.onEdit !== nextProps.onEdit ||
+    prevProps.onDelete !== nextProps.onDelete ||
+    prevProps.onClone !== nextProps.onClone ||
+    prevProps.isPending !== nextProps.isPending ||
+    prevProps.className !== nextProps.className
+  ) {
+    return false;
+  }
+
+  // 2. Fast path reference check for task
+  if (prevProps.task === nextProps.task) return true;
+
+  const prev = prevProps.task;
+  const next = nextProps.task;
+
+  // 3. Explicit comparison of visible task fields
+  // We avoid checking updatedAt since it might not reflect optimistic updates
+  if (
+    prev.id !== next.id ||
+    prev.title !== next.title ||
+    prev.description !== next.description ||
+    prev.status !== next.status ||
+    prev.priority !== next.priority
+  ) {
+    return false;
+  }
+
+  // Handle Date comparison (Server Components serialize dates to strings)
+  const prevDate = prev.dueDate ? new Date(prev.dueDate).getTime() : null;
+  const nextDate = next.dueDate ? new Date(next.dueDate).getTime() : null;
+  if (prevDate !== nextDate) return false;
+
+  // 4. Deep comparison of labels
+  if (prev.labels.length !== next.labels.length) return false;
+
+  // Sort labels or just compare directly if they are usually ordered
+  for (let i = 0; i < prev.labels.length; i++) {
+    const pLabel = prev.labels[i];
+    const nLabel = next.labels[i];
+    if (
+      pLabel.id !== nLabel.id ||
+      pLabel.name !== nLabel.name ||
+      pLabel.color !== nLabel.color
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +169,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);

@@ -1,0 +1,28 @@
+
+> @devboard-interactive/web@0.1.0 dev
+> next dev
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+○ Compiling instrumentation Node.js ...
+✓ Ready in 8.7s
+○ Compiling /signin ...
+ GET /signin 200 in 25.6s (compile: 23.1s, proxy.ts: 39ms, render: 2.4s)
+ POST /signin 200 in 269ms (compile: 36ms, proxy.ts: 42ms, render: 191ms)
+✓ Finished writing to filesystem cache in 10.1s
+ GET /signin 200 in 368ms (compile: 37ms, proxy.ts: 23ms, render: 308ms)
+ POST /signin 200 in 222ms (compile: 37ms, proxy.ts: 27ms, render: 158ms)
+ POST /signin 200 in 179ms (compile: 28ms, proxy.ts: 20ms, render: 131ms)
