@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -28,6 +28,72 @@ const capitalize = (s: string) =>
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
+//
+// ⚡ Bolt: Custom comparison function to handle Server Component serialization differences
+export const areTaskPropsEqual = (
+  prevProps: TaskProps,
+  nextProps: TaskProps
+) => {
+  // 1. Shallow compare non-task props
+  if (
+    prevProps.isPending !== nextProps.isPending ||
+    prevProps.onEdit !== nextProps.onEdit ||
+    prevProps.onDelete !== nextProps.onDelete ||
+    prevProps.onClone !== nextProps.onClone
+  ) {
+    return false;
+  }
+
+  // 2. Fast path reference check
+  if (prevProps.task === nextProps.task) {
+    return true;
+  }
+
+  const prev = prevProps.task;
+  const next = nextProps.task;
+
+  // 3. Explicit comparison of visible task fields
+  // We explicitly avoid relying on `updatedAt` to ensure UI consistency during optimistic updates.
+  if (
+    prev.id !== next.id ||
+    prev.title !== next.title ||
+    prev.description !== next.description ||
+    prev.status !== next.status ||
+    prev.priority !== next.priority
+  ) {
+    return false;
+  }
+
+  // Handle Date comparison (Server Components serialize dates to strings)
+  const prevDate = prev.dueDate ? new Date(prev.dueDate).getTime() : null;
+  const nextDate = next.dueDate ? new Date(next.dueDate).getTime() : null;
+
+  if (prevDate !== nextDate) {
+    return false;
+  }
+
+  // Deep compare labels (id, name, color)
+  if (prev.labels.length !== next.labels.length) {
+    return false;
+  }
+
+  // Sort labels by id to ensure order doesn't affect comparison
+  const prevLabels = [...prev.labels].sort((a, b) => a.id.localeCompare(b.id));
+  const nextLabels = [...next.labels].sort((a, b) => a.id.localeCompare(b.id));
+
+  for (let i = 0; i < prevLabels.length; i++) {
+    if (
+      prevLabels[i].id !== nextLabels[i].id ||
+      prevLabels[i].name !== nextLabels[i].name ||
+      prevLabels[i].color !== nextLabels[i].color
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 export const Task = memo(function Task({
   task,
   onEdit,
@@ -115,4 +181,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
