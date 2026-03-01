@@ -72,21 +72,30 @@ export const areTaskPropsEqual = (
     return false;
   }
 
-  // Deep compare labels (id, name, color)
+  // Compare labels (id, name, color) without allocating new arrays
   if (prev.labels.length !== next.labels.length) {
     return false;
   }
 
-  // Sort labels by id to ensure order doesn't affect comparison
-  const prevLabels = [...prev.labels].sort((a, b) => a.id.localeCompare(b.id));
-  const nextLabels = [...next.labels].sort((a, b) => a.id.localeCompare(b.id));
+  // Since tasks usually have a small number of labels (0-3), O(N^2) search is
+  // actually faster and allocates less memory than creating Sets or sorting.
+  for (let i = 0; i < prev.labels.length; i++) {
+    const pLabel = prev.labels[i];
+    let found = false;
 
-  for (let i = 0; i < prevLabels.length; i++) {
-    if (
-      prevLabels[i].id !== nextLabels[i].id ||
-      prevLabels[i].name !== nextLabels[i].name ||
-      prevLabels[i].color !== nextLabels[i].color
-    ) {
+    for (let j = 0; j < next.labels.length; j++) {
+      const nLabel = next.labels[j];
+      if (
+        pLabel.id === nLabel.id &&
+        pLabel.name === nLabel.name &&
+        pLabel.color === nLabel.color
+      ) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
       return false;
     }
   }
