@@ -95,6 +95,25 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
     async (fieldName: string, value: string | Date | null | string[] | Status | Priority) => {
       if (!task) return;
 
+      // Centralized change detection to prevent redundant server calls
+      let hasChanged = true;
+      if (fieldName === "title" || fieldName === "status" || fieldName === "priority") {
+        hasChanged = task[fieldName as keyof TaskDto] !== value;
+      } else if (fieldName === "description") {
+        const normalizedValue = value === "" ? null : value;
+        hasChanged = task.description !== normalizedValue;
+      } else if (fieldName === "dueDate") {
+        const currentDueDate = task.dueDate ? new Date(task.dueDate).getTime() : null;
+        const newDueDate = value ? new Date(value as Date | string).getTime() : null;
+        hasChanged = currentDueDate !== newDueDate;
+      } else if (fieldName === "labelIds") {
+        const currentLabelIds = [...(task.labels?.map((l) => l.id) || [])].sort().join(",");
+        const newLabelIds = [...((value as string[]) || [])].sort().join(",");
+        hasChanged = currentLabelIds !== newLabelIds;
+      }
+
+      if (!hasChanged) return;
+
       setSavingField(fieldName);
       try {
         const updateData: {
