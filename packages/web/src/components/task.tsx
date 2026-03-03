@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -28,6 +28,52 @@ const capitalize = (s: string) =>
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
+function areTaskPropsEqual(prevProps: TaskProps, nextProps: TaskProps) {
+  if (
+    prevProps.onEdit !== nextProps.onEdit ||
+    prevProps.onDelete !== nextProps.onDelete ||
+    prevProps.onClone !== nextProps.onClone ||
+    prevProps.isPending !== nextProps.isPending
+  ) {
+    return false;
+  }
+
+  if (prevProps.task === nextProps.task) {
+    return true;
+  }
+
+  const p = prevProps.task;
+  const n = nextProps.task;
+
+  const getMs = (d: Date | string | number | null | undefined) =>
+    d ? new Date(d).getTime() : null;
+
+  if (
+    p.title !== n.title ||
+    p.description !== n.description ||
+    p.status !== n.status ||
+    p.priority !== n.priority ||
+    getMs(p.dueDate) !== getMs(n.dueDate) ||
+    p.labels.length !== n.labels.length
+  ) {
+    return false;
+  }
+
+  for (let i = 0; i < p.labels.length; i++) {
+    const pLabel = p.labels[i];
+    const nLabel = n.labels[i];
+    if (
+      pLabel.id !== nLabel.id ||
+      pLabel.name !== nLabel.name ||
+      pLabel.color !== nLabel.color
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export const Task = memo(function Task({
   task,
   onEdit,
@@ -115,4 +161,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
