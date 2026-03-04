@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,87 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+// Helper to compare dates that might come as strings from Server Components
+const isSameDate = (
+  a: Date | string | null | undefined,
+  b: Date | string | null | undefined,
+) => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return new Date(a).getTime() === new Date(b).getTime();
+};
+
+export const areTaskPropsEqual = (
+  prevProps: TaskProps,
+  nextProps: TaskProps,
+) => {
+  // 1. Shallow comparison of non-task props (isPending, callbacks, HTML attributes)
+  const { task: prevTask, ...prevRest } = prevProps;
+  const { task: nextTask, ...nextRest } = nextProps;
+
+  const prevKeys = Object.keys(prevRest);
+  if (prevKeys.length !== Object.keys(nextRest).length) return false;
+  for (const key of prevKeys) {
+    if (
+      (prevRest as Record<string, unknown>)[key] !==
+      (nextRest as Record<string, unknown>)[key]
+    ) {
+      return false;
+    }
+  }
+
+  // 2. Fast path for reference equality
+  if (prevTask === nextTask) return true;
+
+  // 3. Shallow comparison of all task fields EXCEPT updatedAt, labels, and dueDate
+  // We DELIBERATELY EXCLUDE updatedAt from this comparison.
+  // When a task is optimistically updated on the client, its content changes
+  // but updatedAt might not match the server's new timestamp yet. If we
+  // depended on updatedAt, the component might revert to a stale state
+  // or re-render unnecessarily when the server finally syncs.
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    updatedAt: _prevUpdatedAt,
+    labels: prevLabels,
+    dueDate: prevDueDate,
+    ...prevTaskRest
+  } = prevTask;
+
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    updatedAt: _nextUpdatedAt,
+    labels: nextLabels,
+    dueDate: nextDueDate,
+    ...nextTaskRest
+  } = nextTask;
+
+  const taskKeys = Object.keys(prevTaskRest) as Array<keyof typeof prevTaskRest>;
+  if (taskKeys.length !== Object.keys(nextTaskRest).length) return false;
+
+  for (const key of taskKeys) {
+    if (prevTaskRest[key] !== nextTaskRest[key]) {
+      return false;
+    }
+  }
+
+  // Compare dueDate specially since it might be a Date object or string
+  if (!isSameDate(prevDueDate, nextDueDate)) return false;
+
+  // 4. Deep comparison of labels
+  if (prevLabels.length !== nextLabels.length) return false;
+
+  // Assumes labels are generally stable in order, or we can just check IDs
+  // Since labels are small, a simple ID check is usually sufficient
+  const prevLabelIds = [...prevLabels].map((l) => l.id).sort();
+  const nextLabelIds = [...nextLabels].map((l) => l.id).sort();
+
+  for (let i = 0; i < prevLabelIds.length; i++) {
+    if (prevLabelIds[i] !== nextLabelIds[i]) return false;
+  }
+
+  return true;
+};
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +196,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
