@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,48 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+// Custom comparison to handle Next.js Server Components passing newly serialized
+// object references on every render, invalidating standard React.memo.
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // Shallow comparison of non-task props
+  if (prev.isPending !== next.isPending) return false;
+
+  // Fast path reference check
+  if (prev.task === next.task) return true;
+
+  const pt = prev.task;
+  const nt = next.task;
+
+  // Explicit comparison of visible task fields
+  if (
+    pt.id !== nt.id ||
+    pt.title !== nt.title ||
+    pt.description !== nt.description ||
+    pt.status !== nt.status ||
+    pt.priority !== nt.priority
+  ) {
+    return false;
+  }
+
+  // Handle Date and string representations safely
+  const prevDueDate = pt.dueDate ? new Date(pt.dueDate).getTime() : null;
+  const nextDueDate = nt.dueDate ? new Date(nt.dueDate).getTime() : null;
+  if (prevDueDate !== nextDueDate) return false;
+
+  // Deep comparison of labels
+  if (pt.labels.length !== nt.labels.length) return false;
+  for (let i = 0; i < pt.labels.length; i++) {
+    const pl = pt.labels[i];
+    const nl = nt.labels[i];
+    if (pl.id !== nl.id || pl.name !== nl.name || pl.color !== nl.color) {
+      return false;
+    }
+  }
+
+  // Avoid relying on updatedAt to ensure UI consistency during optimistic updates
+  return true;
+}
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +157,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
