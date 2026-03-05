@@ -29,42 +29,60 @@ const capitalize = (s: string) =>
 // Custom comparison to handle Next.js Server Components passing newly serialized
 // object references on every render, invalidating standard React.memo.
 function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
-  // Shallow comparison of non-task props
-  if (prev.isPending !== next.isPending) return false;
+  // Shallow comparison of all non-task props to prevent stale closures
+  for (const key in prev) {
+    if (key !== "task" && prev[key as keyof TaskProps] !== next[key as keyof TaskProps]) {
+      return false;
+    }
+  }
+  for (const key in next) {
+    if (key !== "task" && !(key in prev)) {
+      return false;
+    }
+  }
 
-  // Fast path reference check
+  // Fast path reference check for the task object
   if (prev.task === next.task) return true;
 
   const pt = prev.task;
   const nt = next.task;
 
-  // Explicit comparison of visible task fields
-  if (
-    pt.id !== nt.id ||
-    pt.title !== nt.title ||
-    pt.description !== nt.description ||
-    pt.status !== nt.status ||
-    pt.priority !== nt.priority
-  ) {
-    return false;
-  }
+  // Explicit comparison of visible task fields dynamically
+  const keys = new Set([...Object.keys(pt), ...Object.keys(nt)]) as Set<keyof TaskModel>;
 
-  // Handle Date and string representations safely
-  const prevDueDate = pt.dueDate ? new Date(pt.dueDate).getTime() : null;
-  const nextDueDate = nt.dueDate ? new Date(nt.dueDate).getTime() : null;
-  if (prevDueDate !== nextDueDate) return false;
+  for (const key of keys) {
+    // Avoid relying on updatedAt to ensure UI consistency during optimistic updates
+    if (key === "updatedAt" || key === "createdAt") continue;
 
-  // Deep comparison of labels
-  if (pt.labels.length !== nt.labels.length) return false;
-  for (let i = 0; i < pt.labels.length; i++) {
-    const pl = pt.labels[i];
-    const nl = nt.labels[i];
-    if (pl.id !== nl.id || pl.name !== nl.name || pl.color !== nl.color) {
+    if (key === "dueDate") {
+      // Handle Date and string representations safely
+      const prevDueDate = pt.dueDate ? new Date(pt.dueDate).getTime() : null;
+      const nextDueDate = nt.dueDate ? new Date(nt.dueDate).getTime() : null;
+      if (prevDueDate !== nextDueDate) return false;
+      continue;
+    }
+
+    if (key === "labels") {
+      // Deep comparison of labels
+      const prevLabels = pt.labels || [];
+      const nextLabels = nt.labels || [];
+      if (prevLabels.length !== nextLabels.length) return false;
+
+      for (let i = 0; i < prevLabels.length; i++) {
+        const pl = prevLabels[i];
+        const nl = nextLabels[i];
+        if (pl.id !== nl.id || pl.name !== nl.name || pl.color !== nl.color) {
+          return false;
+        }
+      }
+      continue;
+    }
+
+    if (pt[key] !== nt[key]) {
       return false;
     }
   }
 
-  // Avoid relying on updatedAt to ensure UI consistency during optimistic updates
   return true;
 }
 
