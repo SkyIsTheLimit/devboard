@@ -26,6 +26,59 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+// Helper to safely compare Dates, strings, or null/undefined
+const areDatesEqual = (a?: Date | string | null, b?: Date | string | null) => {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return new Date(a).getTime() === new Date(b).getTime();
+};
+
+export const areTaskPropsEqual = (prev: TaskProps, next: TaskProps) => {
+  // 1. Shallow compare non-task props
+  if (
+    prev.onEdit !== next.onEdit ||
+    prev.onDelete !== next.onDelete ||
+    prev.onClone !== next.onClone ||
+    prev.isPending !== next.isPending ||
+    prev.className !== next.className
+  ) {
+    return false;
+  }
+
+  // 2. Fast path: same reference
+  if (prev.task === next.task) return true;
+
+  // 3. Deep compare visible task fields (ignoring updatedAt to ensure UI consistency)
+  const p = prev.task;
+  const n = next.task;
+
+  if (
+    p.id !== n.id ||
+    p.title !== n.title ||
+    p.description !== n.description ||
+    p.status !== n.status ||
+    p.priority !== n.priority ||
+    !areDatesEqual(p.dueDate, n.dueDate)
+  ) {
+    return false;
+  }
+
+  // 4. Compare labels deep
+  const pLabels = p.labels || [];
+  const nLabels = n.labels || [];
+  if (pLabels.length !== nLabels.length) return false;
+
+  for (let i = 0; i < pLabels.length; i++) {
+    const pl = pLabels[i];
+    const nl = nLabels[i];
+    if (pl.id !== nl.id || pl.name !== nl.name || pl.color !== nl.color) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +168,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
