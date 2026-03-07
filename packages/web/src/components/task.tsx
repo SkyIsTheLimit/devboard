@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -28,6 +28,62 @@ const capitalize = (s: string) =>
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // 1. Shallow comparison of non-task props
+  if (
+    prev.isPending !== next.isPending ||
+    prev.onEdit !== next.onEdit ||
+    prev.onDelete !== next.onDelete ||
+    prev.onClone !== next.onClone
+  ) {
+    return false;
+  }
+
+  // 2. Fast path reference check
+  if (prev.task === next.task) {
+    return true;
+  }
+
+  // 3. Explicit comparison of visible task fields
+  const prevTask = prev.task;
+  const nextTask = next.task;
+
+  if (
+    prevTask.title !== nextTask.title ||
+    prevTask.description !== nextTask.description ||
+    prevTask.status !== nextTask.status ||
+    prevTask.priority !== nextTask.priority
+  ) {
+    return false;
+  }
+
+  // Handle Date instances and string representations for dueDate
+  const prevDueDate = prevTask.dueDate ? new Date(prevTask.dueDate).getTime() : null;
+  const nextDueDate = nextTask.dueDate ? new Date(nextTask.dueDate).getTime() : null;
+  if (prevDueDate !== nextDueDate) {
+    return false;
+  }
+
+  // Deep comparison of labels
+  if (prevTask.labels.length !== nextTask.labels.length) {
+    return false;
+  }
+
+  for (let i = 0; i < prevTask.labels.length; i++) {
+    const prevLabel = prevTask.labels[i];
+    const nextLabel = nextTask.labels[i];
+    if (
+      prevLabel.id !== nextLabel.id ||
+      prevLabel.name !== nextLabel.name ||
+      prevLabel.color !== nextLabel.color
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export const Task = memo(function Task({
   task,
   onEdit,
@@ -115,4 +171,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
