@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,52 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // Shallow compare standard DOM/Item props first
+  const keys = new Set([...Object.keys(prev), ...Object.keys(next)]) as Set<keyof TaskProps>;
+  for (const key of keys) {
+    if (key === 'task') continue; // Handled below
+    if (prev[key] !== next[key]) {
+      return false;
+    }
+  }
+
+  // Fast path for identical object reference
+  if (prev.task === next.task) {
+    return true;
+  }
+
+  // Compare relevant task content fields (excluding updatedAt, etc. that might change without visible effect during optimistic updates)
+  if (
+    prev.task.title !== next.task.title ||
+    prev.task.description !== next.task.description ||
+    prev.task.status !== next.task.status ||
+    prev.task.priority !== next.task.priority
+  ) {
+    return false;
+  }
+
+  const prevDueDate = prev.task.dueDate ? new Date(prev.task.dueDate).getTime() : null;
+  const nextDueDate = next.task.dueDate ? new Date(next.task.dueDate).getTime() : null;
+  if (prevDueDate !== nextDueDate) {
+    return false;
+  }
+
+  if (prev.task.labels.length !== next.task.labels.length) {
+    return false;
+  }
+
+  for (let i = 0; i < prev.task.labels.length; i++) {
+    const pLabel = prev.task.labels[i];
+    const nLabel = next.task.labels[i];
+    if (pLabel.id !== nLabel.id || pLabel.name !== nLabel.name || pLabel.color !== nLabel.color) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +161,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
