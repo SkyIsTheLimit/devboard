@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { TaskDto as TaskModel } from "@/types";
+import { Status, TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,67 +25,6 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-
-function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
-  // 1. Shallow comparison of non-task props
-  if (
-    prev.onEdit !== next.onEdit ||
-    prev.onDelete !== next.onDelete ||
-    prev.onClone !== next.onClone ||
-    prev.isPending !== next.isPending ||
-    Object.keys(prev).filter(k => !['task', 'onEdit', 'onDelete', 'onClone', 'isPending'].includes(k)).some(k => (prev as unknown as Record<string, unknown>)[k] !== (next as unknown as Record<string, unknown>)[k])
-  ) {
-    return false;
-  }
-
-  // 2. Fast path reference check
-  if (prev.task === next.task) {
-    return true;
-  }
-
-  // 3. Explicit comparison of visible task fields
-  const pTask = prev.task;
-  const nTask = next.task;
-
-  if (
-    pTask.id !== nTask.id ||
-    pTask.title !== nTask.title ||
-    pTask.description !== nTask.description ||
-    pTask.status !== nTask.status ||
-    pTask.priority !== nTask.priority
-  ) {
-    return false;
-  }
-
-  // Compare dueDate (handling Next.js serialization strings to Date)
-  const prevDueDate = pTask.dueDate ? new Date(pTask.dueDate).getTime() : null;
-  const nextDueDate = nTask.dueDate ? new Date(nTask.dueDate).getTime() : null;
-  if (prevDueDate !== nextDueDate) {
-    return false;
-  }
-
-  // Deep comparison of labels
-  if (pTask.labels.length !== nTask.labels.length) {
-    return false;
-  }
-
-  // Ensure labels are identical in id, name, and color
-  for (let i = 0; i < pTask.labels.length; i++) {
-    const pLabel = pTask.labels[i];
-
-    // Fallback search if order changes (though typically ordered by db query)
-    const matchingLabel = nTask.labels.find(l => l.id === pLabel.id);
-    if (
-      !matchingLabel ||
-      pLabel.name !== matchingLabel.name ||
-      pLabel.color !== matchingLabel.color
-    ) {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -176,4 +115,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-}, areTaskPropsEqual);
+});
