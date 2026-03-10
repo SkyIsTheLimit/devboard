@@ -33,7 +33,7 @@ function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
     prev.onDelete !== next.onDelete ||
     prev.onClone !== next.onClone ||
     prev.isPending !== next.isPending ||
-    Object.keys(prev).filter(k => !['task', 'onEdit', 'onDelete', 'onClone', 'isPending'].includes(k)).some(k => (prev as Record<string, unknown>)[k] !== (next as Record<string, unknown>)[k])
+    Object.keys(prev).filter(k => !['task', 'onEdit', 'onDelete', 'onClone', 'isPending'].includes(k)).some(k => (prev as unknown as Record<string, unknown>)[k] !== (next as unknown as Record<string, unknown>)[k])
   ) {
     return false;
   }
