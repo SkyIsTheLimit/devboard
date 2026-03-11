@@ -26,6 +26,65 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+// Custom comparison function for React.memo to prevent unnecessary re-renders
+// since Server Components serialize Date objects to strings, causing new object
+// references on every render.
+const areTaskPropsEqual = (prev: TaskProps, next: TaskProps) => {
+  // 1. Shallow comparison of non-task props
+  if (
+    prev.onEdit !== next.onEdit ||
+    prev.onDelete !== next.onDelete ||
+    prev.onClone !== next.onClone ||
+    prev.isPending !== next.isPending
+  ) {
+    return false;
+  }
+
+  // 2. Fast path reference check
+  if (prev.task === next.task) {
+    return true;
+  }
+
+  // 3. Explicit comparison of visible task fields
+  if (
+    prev.task.id !== next.task.id ||
+    prev.task.title !== next.task.title ||
+    prev.task.description !== next.task.description ||
+    prev.task.status !== next.task.status ||
+    prev.task.priority !== next.task.priority
+  ) {
+    return false;
+  }
+
+  // Handle Date comparison (might be strings from Server Components)
+  const prevDueDate = prev.task.dueDate ? new Date(prev.task.dueDate).getTime() : null;
+  const nextDueDate = next.task.dueDate ? new Date(next.task.dueDate).getTime() : null;
+
+  if (prevDueDate !== nextDueDate) {
+    return false;
+  }
+
+  // Deep comparison of labels
+  if (prev.task.labels.length !== next.task.labels.length) {
+    return false;
+  }
+
+  for (let i = 0; i < prev.task.labels.length; i++) {
+    const prevLabel = prev.task.labels[i];
+    const nextLabel = next.task.labels[i];
+
+    if (
+      prevLabel.id !== nextLabel.id ||
+      prevLabel.name !== nextLabel.name ||
+      prevLabel.color !== nextLabel.color
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +174,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
