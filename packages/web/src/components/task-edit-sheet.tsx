@@ -95,35 +95,6 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
     async (fieldName: string, value: string | Date | null | string[] | Status | Priority) => {
       if (!task) return;
 
-      // ⚡ Bolt: Centralized change detection to prevent redundant server calls
-      // Expected impact: Eliminates 100% of unnecessary API calls and database writes
-      // when a user focuses and blurs a field without modifying its value.
-      let hasChanged = true;
-
-      // Handle different field types and change detection
-      if (fieldName === "description") {
-        const normalizedValue = value === "" ? null : (value as string);
-        hasChanged = task.description !== normalizedValue;
-      } else if (fieldName === "dueDate") {
-        const newTime = value ? (value as Date).getTime() : null;
-        const oldTime = task.dueDate ? new Date(task.dueDate).getTime() : null;
-        hasChanged = newTime !== oldTime;
-      } else if (fieldName === "labelIds") {
-        const newLabelIds = [...(value as string[])].sort().join(",");
-        const oldLabelIds = [...(task.labels?.map((l) => l.id) || [])].sort().join(",");
-        hasChanged = newLabelIds !== oldLabelIds;
-      } else if (fieldName === "title") {
-        hasChanged = task.title !== value;
-      } else if (fieldName === "status") {
-        hasChanged = task.status !== value;
-      } else if (fieldName === "priority") {
-        hasChanged = task.priority !== value;
-      }
-
-      if (!hasChanged) {
-        return;
-      }
-
       setSavingField(fieldName);
       try {
         const updateData: {
@@ -138,6 +109,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
           id: task.id,
         };
 
+        // Handle different field types
         if (fieldName === "description") {
           updateData.description = value === "" ? null : (value as string);
         } else if (fieldName === "dueDate") {
