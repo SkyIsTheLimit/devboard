@@ -324,8 +324,9 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
 
           <form.Field name="labelIds">
             {(field) => {
+              const selectedLabelIdsSet = new Set(field.state.value);
               const selectedLabels = availableLabels.filter((label) =>
-                field.state.value.includes(label.id)
+                selectedLabelIdsSet.has(label.id)
               );
 
               return (
@@ -372,7 +373,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = field.state.value.includes(label.id);
+                              const isSelected = selectedLabelIdsSet.has(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
