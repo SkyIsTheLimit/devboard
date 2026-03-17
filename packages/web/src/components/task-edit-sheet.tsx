@@ -324,8 +324,10 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
 
           <form.Field name="labelIds">
             {(field) => {
+              // ⚡ Bolt: Precompute Set for O(1) membership lookups instead of O(N*M) with .includes()
+              const selectedLabelIds = new Set(field.state.value);
               const selectedLabels = availableLabels.filter((label) =>
-                field.state.value.includes(label.id)
+                selectedLabelIds.has(label.id)
               );
 
               return (
@@ -372,7 +374,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = field.state.value.includes(label.id);
+                              const isSelected = selectedLabelIds.has(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
