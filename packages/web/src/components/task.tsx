@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";

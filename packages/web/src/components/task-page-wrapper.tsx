@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { TaskDto } from "@/types";
-import { Header } from "./header";
 import { TasksListClient } from "./task-list-client";
 import { Container } from "./container";
 import { Button } from "@devboard-interactive/ui/button";
@@ -18,6 +17,7 @@ interface TaskPageWrapperProps {
   filter?: React.ReactNode;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function TaskPageWrapper({ tasks, user, filter }: TaskPageWrapperProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
