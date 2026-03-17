@@ -89,6 +89,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
       form.setFieldValue("dueDate", task.dueDate || null);
       form.setFieldValue("labelIds", task.labels?.map((l) => l.id) || []);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task?.id]);
 
   const handleAutoSave = useCallback(
@@ -130,14 +131,14 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
         onSave?.();
 
         // Show subtle success feedback
-        const fieldLabels: Record<string, string> = {
-          title: "Title",
-          description: "Description",
-          status: "Status",
-          priority: "Priority",
-          dueDate: "Due date",
-          labelIds: "Labels",
-        };
+        // const fieldLabels: Record<string, string> = {
+        //   title: "Title",
+        //   description: "Description",
+        //   status: "Status",
+        //   priority: "Priority",
+        //   dueDate: "Due date",
+        //   labelIds: "Labels",
+        // };
         // toast.success(`${fieldLabels[fieldName]} updated`);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : `Failed to update ${fieldName}`);
@@ -324,8 +325,10 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
 
           <form.Field name="labelIds">
             {(field) => {
+              // ⚡ Bolt: Precompute Set for O(1) membership lookups instead of O(N*M) with .includes()
+              const selectedLabelIds = new Set(field.state.value);
               const selectedLabels = availableLabels.filter((label) =>
-                field.state.value.includes(label.id)
+                selectedLabelIds.has(label.id)
               );
 
               return (
@@ -372,7 +375,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = field.state.value.includes(label.id);
+                              const isSelected = selectedLabelIds.has(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
