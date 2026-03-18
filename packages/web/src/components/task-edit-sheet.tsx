@@ -324,13 +324,8 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
 
           <form.Field name="labelIds">
             {(field) => {
-              // ⚡ Bolt Optimization: Use a Set for O(1) membership lookups.
-              // This reduces complexity from O(N*M) to O(N+M) when filtering
-              // available labels and checking for selection status.
-              const selectedIdsSet = new Set(field.state.value);
-
               const selectedLabels = availableLabels.filter((label) =>
-                selectedIdsSet.has(label.id)
+                field.state.value.includes(label.id)
               );
 
               return (
@@ -377,7 +372,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = selectedIdsSet.has(label.id);
+                              const isSelected = field.state.value.includes(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
