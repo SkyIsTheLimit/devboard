@@ -18,8 +18,10 @@ export default async function Home({
   if (!session) redirect("/signin");
 
   const searchItem = parseSearchForStatus(searchParams.status?.toString());
-  const tasks = await getTasks(searchItem.status);
-  const labels = await getLabels();
+  const [tasks, labels] = await Promise.all([
+    getTasks(searchItem.status),
+    getLabels(),
+  ]);
 
   return (
     <TaskPageWrapper

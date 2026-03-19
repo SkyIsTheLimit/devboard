@@ -19,7 +19,10 @@ interface TaskPageWrapperProps {
   filter?: React.ReactNode;
 }
 
-export function TaskPageWrapper({ tasks, labels, user, filter }: TaskPageWrapperProps) {
+export function TaskPageWrapper({
+  tasks,
+  labels,
+}: TaskPageWrapperProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleCreate = () => {
@@ -31,7 +34,7 @@ export function TaskPageWrapper({ tasks, labels, user, filter }: TaskPageWrapper
       <Button
         onClick={handleCreate}
         size="lg"
-        variant={'secondary'}
+        variant={"secondary"}
         className="gap-2 fixed bottom-8 right-8 md:static mb-3"
       >
         <Plus className="h-4 w-4" />
