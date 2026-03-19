@@ -44,15 +44,16 @@ import { format } from "date-fns";
 
 interface TaskEditSheetProps {
   task: TaskDto | null;
+  initialLabels?: LabelDto[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave?: () => void;
 }
 
-export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditSheetProps) {
+export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave }: TaskEditSheetProps) {
   const router = useRouter();
   const [savingField, setSavingField] = useState<string | null>(null);
-  const [availableLabels, setAvailableLabels] = useState<LabelDto[]>([]);
+  const [availableLabels, setAvailableLabels] = useState<LabelDto[]>(initialLabels || []);
   const [labelsOpen, setLabelsOpen] = useState(false);
 
   const form = useForm({
@@ -66,8 +67,9 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
     },
   });
 
-  // Fetch available labels on mount
+  // Fetch available labels on mount if they weren't prefetched
   useEffect(() => {
+    if (availableLabels.length > 0) return;
     const fetchLabels = async () => {
       try {
         const labels = await getLabels();
@@ -77,7 +79,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
       }
     };
     fetchLabels();
-  }, []);
+  }, [availableLabels.length]);
 
   // Reset form when task changes
   useEffect(() => {
@@ -324,8 +326,11 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
 
           <form.Field name="labelIds">
             {(field) => {
+              // Optimization: Use a Set for O(1) membership lookups.
+              // This turns the O(N*M) label filtering into O(N+M).
+              const selectedSet = new Set(field.state.value);
               const selectedLabels = availableLabels.filter((label) =>
-                field.state.value.includes(label.id)
+                selectedSet.has(label.id)
               );
 
               return (
@@ -372,7 +377,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = field.state.value.includes(label.id);
+                              const isSelected = selectedSet.has(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
