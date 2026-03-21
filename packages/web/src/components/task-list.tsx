@@ -1,9 +1,11 @@
 import { Status } from "@/types";
 import { TasksListClient } from "./task-list-client";
 import { getTasks } from "@/server/tasks";
+import { getLabels } from "@/server/labels";
 
 export async function TasksList({ status }: { status?: Status | undefined }) {
-  const tasks = await getTasks(status);
+  // Parallel fetch both tasks and labels
+  const [tasks, labels] = await Promise.all([getTasks(status), getLabels()]);
 
-  return <TasksListClient tasks={tasks} />;
+  return <TasksListClient tasks={tasks} initialLabels={labels} />;
 }
