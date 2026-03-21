@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { TaskDto } from "@/types";
+import { TaskDto, LabelDto } from "@/types";
 import { Header } from "./header";
 import { TasksListClient } from "./task-list-client";
 import { Container } from "./container";
@@ -10,6 +10,7 @@ import { Plus } from "lucide-react";
 
 interface TaskPageWrapperProps {
   tasks: TaskDto[];
+  initialLabels: LabelDto[];
   user?: {
     name?: string | null;
     email?: string | null;
@@ -18,7 +19,12 @@ interface TaskPageWrapperProps {
   filter?: React.ReactNode;
 }
 
-export function TaskPageWrapper({ tasks, user, filter }: TaskPageWrapperProps) {
+export function TaskPageWrapper({
+  tasks,
+  initialLabels,
+  user,
+  filter,
+}: TaskPageWrapperProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleCreate = () => {
@@ -30,7 +36,7 @@ export function TaskPageWrapper({ tasks, user, filter }: TaskPageWrapperProps) {
       <Button
         onClick={handleCreate}
         size="lg"
-        variant={'secondary'}
+        variant={"secondary"}
         className="gap-2 fixed bottom-8 right-8 md:static mb-3"
       >
         <Plus className="h-4 w-4" />
@@ -39,6 +45,7 @@ export function TaskPageWrapper({ tasks, user, filter }: TaskPageWrapperProps) {
 
       <TasksListClient
         tasks={tasks}
+        initialLabels={initialLabels}
         isCreateOpen={isCreateOpen}
         onCreateOpenChange={setIsCreateOpen}
       />
