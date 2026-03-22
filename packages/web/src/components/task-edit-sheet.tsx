@@ -89,7 +89,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
       form.setFieldValue("dueDate", task.dueDate || null);
       form.setFieldValue("labelIds", task.labels?.map((l) => l.id) || []);
     }
-  }, [task?.id]);
+  }, [task, form]);
 
   const handleAutoSave = useCallback(
     async (fieldName: string, value: string | Date | null | string[] | Status | Priority) => {
@@ -130,14 +130,14 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
         onSave?.();
 
         // Show subtle success feedback
-        const fieldLabels: Record<string, string> = {
-          title: "Title",
-          description: "Description",
-          status: "Status",
-          priority: "Priority",
-          dueDate: "Due date",
-          labelIds: "Labels",
-        };
+        // const fieldLabels: Record<string, string> = {
+        //   title: "Title",
+        //   description: "Description",
+        //   status: "Status",
+        //   priority: "Priority",
+        //   dueDate: "Due date",
+        //   labelIds: "Labels",
+        // };
         // toast.success(`${fieldLabels[fieldName]} updated`);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : `Failed to update ${fieldName}`);
