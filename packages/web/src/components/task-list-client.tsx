@@ -4,7 +4,7 @@ import { cloneTask, deleteTask, hardDeleteTask, restoreTask } from "@/server/tas
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 
 import { Task } from "./task";
-import { TaskDto } from "@/types";
+import { TaskDto, LabelDto } from "@/types";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
 
@@ -22,10 +22,12 @@ const UNDO_DURATION = 6000;
 
 export function TasksListClient({
   tasks,
+  initialLabels,
   isCreateOpen,
   onCreateOpenChange,
 }: {
   tasks: TaskDto[];
+  initialLabels: LabelDto[];
   isCreateOpen?: boolean;
   onCreateOpenChange?: (open: boolean) => void;
 }) {
@@ -230,6 +232,7 @@ export function TasksListClient({
       {(hasEditOpened || isEditOpen) && (
         <TaskEditSheet
           task={editingTask}
+          initialLabels={initialLabels}
           open={isEditOpen}
           onOpenChange={(open) => {
             if (!open) setEditingTask(null);

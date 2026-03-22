@@ -1,0 +1,12 @@
+
+> @devboard-interactive/web@0.1.0 dev
+> next dev
+
+sh: 1: next: not found
+npm error Lifecycle script `dev` failed with error:
+npm error code 127
+npm error path /app/packages/web
+npm error workspace @devboard-interactive/web@0.1.0
+npm error location /app/packages/web
+npm error command failed
+npm error command sh -c next dev
