@@ -3,7 +3,6 @@
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { updateTask } from "@/server/tasks";
-import { getLabels } from "@/server/labels";
 import { TaskDto, LabelDto, Status, Priority } from "@/types";
 import {
   Sheet,
@@ -44,15 +43,23 @@ import { format } from "date-fns";
 
 interface TaskEditSheetProps {
   task: TaskDto | null;
+  initialLabels?: LabelDto[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave?: () => void;
 }
 
-export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditSheetProps) {
+export function TaskEditSheet({
+  task,
+  initialLabels = [],
+  open,
+  onOpenChange,
+  onSave,
+}: TaskEditSheetProps) {
   const router = useRouter();
   const [savingField, setSavingField] = useState<string | null>(null);
-  const [availableLabels, setAvailableLabels] = useState<LabelDto[]>([]);
+  // Use prefetched labels to eliminate the client-side network waterfall on mount
+  const [availableLabels, setAvailableLabels] = useState<LabelDto[]>(initialLabels);
   const [labelsOpen, setLabelsOpen] = useState(false);
 
   const form = useForm({
@@ -66,20 +73,15 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
     },
   });
 
-  // Fetch available labels on mount
+  // Keep availableLabels in sync if initialLabels changes (e.g. after a revalidation)
   useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        const labels = await getLabels();
-        setAvailableLabels(labels);
-      } catch (error) {
-        console.error("Failed to fetch labels:", error);
-      }
-    };
-    fetchLabels();
-  }, []);
+    if (initialLabels.length > 0) {
+      setAvailableLabels(initialLabels);
+    }
+  }, [initialLabels]);
 
   // Reset form when task changes
+  // We only reset when the task ID changes to avoid form resets during auto-save revalidations.
   useEffect(() => {
     if (task) {
       form.setFieldValue("title", task.title);
@@ -89,7 +91,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
       form.setFieldValue("dueDate", task.dueDate || null);
       form.setFieldValue("labelIds", task.labels?.map((l) => l.id) || []);
     }
-  }, [task?.id]);
+  }, [task?.id, form]);
 
   const handleAutoSave = useCallback(
     async (fieldName: string, value: string | Date | null | string[] | Status | Priority) => {
@@ -324,9 +326,11 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
 
           <form.Field name="labelIds">
             {(field) => {
-              const selectedLabels = availableLabels.filter((label) =>
-                field.state.value.includes(label.id)
-              );
+              // Performance Optimization: Use a Set for O(1) lookup complexity.
+              // This reduces the overall rendering complexity from O(N*M) to O(N+M),
+              // where N is the total number of labels and M is the number of selected labels.
+              const selectedSet = new Set(field.state.value);
+              const selectedLabels = availableLabels.filter((label) => selectedSet.has(label.id));
 
               return (
                 <div className="space-y-2">
@@ -372,7 +376,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = field.state.value.includes(label.id);
+                              const isSelected = selectedSet.has(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
