@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { LabelDto, TaskDto } from "@/types";
-import { Header } from "./header";
 import { TasksListClient } from "./task-list-client";
 import { Container } from "./container";
 import { Button } from "@devboard-interactive/ui/button";
@@ -11,15 +10,9 @@ import { Plus } from "lucide-react";
 interface TaskPageWrapperProps {
   tasks: TaskDto[];
   initialLabels?: LabelDto[];
-  user?: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  };
-  filter?: React.ReactNode;
 }
 
-export function TaskPageWrapper({ tasks, initialLabels, user, filter }: TaskPageWrapperProps) {
+export function TaskPageWrapper({ tasks, initialLabels }: TaskPageWrapperProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleCreate = () => {

@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -73,9 +73,11 @@ export const Task = memo(function Task({
             {capitalize(task.priority)}
           </span>
         </div>
-        <ItemDescription className="line-clamp-4 h-full">
-          {task.description}
-        </ItemDescription>
+        <ItemContent className="line-clamp-4 h-full">
+          <ItemDescription>
+            {task.description}
+          </ItemDescription>
+        </ItemContent>
 
         {task.labels.length > 0 && <TaskLabels labels={task.labels} />}
       </ItemContent>
