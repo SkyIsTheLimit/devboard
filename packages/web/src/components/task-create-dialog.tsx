@@ -57,7 +57,7 @@ export function TaskCreateDialog({ open, onOpenChange }: TaskCreateDialogProps) 
         </DialogHeader>
 
         <form
-          onSubmit={(e) => {
+          onSubmit={(e: React.FormEvent) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
@@ -72,7 +72,7 @@ export function TaskCreateDialog({ open, onOpenChange }: TaskCreateDialogProps) 
                   id="title"
                   autoFocus
                   value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   placeholder="Enter task title"
                 />
@@ -90,7 +90,7 @@ export function TaskCreateDialog({ open, onOpenChange }: TaskCreateDialogProps) 
                 <Textarea
                   id="description"
                   value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   placeholder="Enter task description (optional)"
                   rows={4}

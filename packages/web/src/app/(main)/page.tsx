@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getTasks } from "@/server/tasks";
 import { getLabels } from "@/server/labels";
 import { TaskPageWrapper } from "@/components/task-page-wrapper";
+import { Filter } from "@/components/filter";
+import { searchList } from "@/components/filter-status";
 
 export default async function Home({
   searchParams: searchParamsPromise,
@@ -29,6 +31,8 @@ export default async function Home({
     <TaskPageWrapper
       tasks={tasks}
       initialLabels={labels}
+      user={session.user}
+      filter={<Filter activeItem={searchItem} searchList={searchList} />}
     />
   );
 }

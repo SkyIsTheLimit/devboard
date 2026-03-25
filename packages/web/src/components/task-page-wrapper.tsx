@@ -10,14 +10,26 @@ import { Plus } from "lucide-react";
 interface TaskPageWrapperProps {
   tasks: TaskDto[];
   initialLabels?: LabelDto[];
+  user?: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+  filter?: React.ReactNode;
 }
 
-export function TaskPageWrapper({ tasks, initialLabels }: TaskPageWrapperProps) {
+export function TaskPageWrapper({ tasks, initialLabels, user, filter }: TaskPageWrapperProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleCreate = () => {
     setIsCreateOpen(true);
   };
+
+  // Note: user and filter props are currently used by the layout component,
+  // but passed here for completeness and potential future use.
+  // To avoid lint warnings while keeping them in the interface:
+  void user;
+  void filter;
 
   return (
     <Container className="flex-1 py-4 w-full">

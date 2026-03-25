@@ -73,11 +73,9 @@ export const Task = memo(function Task({
             {capitalize(task.priority)}
           </span>
         </div>
-        <ItemContent className="line-clamp-4 h-full">
-          <ItemDescription>
-            {task.description}
-          </ItemDescription>
-        </ItemContent>
+        <ItemDescription className="line-clamp-4 h-full">
+          {task.description}
+        </ItemDescription>
 
         {task.labels.length > 0 && <TaskLabels labels={task.labels} />}
       </ItemContent>

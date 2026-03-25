@@ -170,7 +170,7 @@ export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave 
                 <Input
                   id="edit-title"
                   value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(e.target.value)}
                   onBlur={async () => {
                     field.handleBlur();
                     if (field.state.value.trim()) {
@@ -195,7 +195,7 @@ export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave 
                 <Textarea
                   id="edit-description"
                   value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => field.handleChange(e.target.value)}
                   onBlur={async () => {
                     field.handleBlur();
                     await handleAutoSave("description", field.state.value);
@@ -218,7 +218,7 @@ export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave 
                 </div>
                 <Select
                   value={field.state.value}
-                  onValueChange={async (value) => {
+                  onValueChange={async (value: string) => {
                     const newStatus = value as Status;
                     field.handleChange(newStatus);
                     await handleAutoSave("status", newStatus);
@@ -249,7 +249,7 @@ export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave 
                 </div>
                 <Select
                   value={field.state.value}
-                  onValueChange={async (value) => {
+                  onValueChange={async (value: string) => {
                     const newPriority = value as Priority;
                     field.handleChange(newPriority);
                     await handleAutoSave("priority", newPriority);
@@ -295,7 +295,7 @@ export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave 
                     <Calendar
                       mode="single"
                       selected={field.state.value ? new Date(field.state.value) : undefined}
-                      onSelect={async (date) => {
+                      onSelect={async (date: Date | undefined) => {
                         field.handleChange(date || null);
                         await handleAutoSave("dueDate", date || null);
                       }}
@@ -383,7 +383,7 @@ export function TaskEditSheet({ task, initialLabels, open, onOpenChange, onSave 
                                   value={label.name}
                                   onSelect={async () => {
                                     const newValue = isSelected
-                                      ? field.state.value.filter((id) => id !== label.id)
+                                      ? field.state.value.filter((id: string) => id !== label.id)
                                       : [...field.state.value, label.id];
                                     field.handleChange(newValue);
                                     await handleAutoSave("labelIds", newValue);
