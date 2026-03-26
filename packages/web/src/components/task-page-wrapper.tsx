@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { TaskDto, LabelDto } from "@/types";
-import { Header } from "./header";
+
 import { TasksListClient } from "./task-list-client";
 import { Container } from "./container";
 import { Button } from "@devboard-interactive/ui/button";
@@ -19,7 +19,7 @@ interface TaskPageWrapperProps {
   filter?: React.ReactNode;
 }
 
-export function TaskPageWrapper({ tasks, initialLabels, user: _user, filter: _filter }: TaskPageWrapperProps) {
+export function TaskPageWrapper({ tasks, initialLabels }: TaskPageWrapperProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleCreate = () => {
