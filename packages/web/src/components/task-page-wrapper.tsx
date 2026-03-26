@@ -19,7 +19,7 @@ interface TaskPageWrapperProps {
   filter?: React.ReactNode;
 }
 
-export function TaskPageWrapper({ tasks, initialLabels, user, filter }: TaskPageWrapperProps) {
+export function TaskPageWrapper({ tasks, initialLabels, user: _user, filter: _filter }: TaskPageWrapperProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleCreate = () => {
