@@ -58,10 +58,14 @@ export function TasksListClient({
   useEffect(() => {
     // Remove pending deletes for tasks that no longer exist in props (already deleted)
     setPendingDeletes((prev) => {
-      const taskIds = new Set(tasks.map((t) => t.id));
+      // ⚡ Bolt Optimization: Early return for common case to avoid O(N) Set creation
+      if (prev.size === 0) return prev;
+
       const next = new Set<string>();
+      // ⚡ Bolt Optimization: Check existence in tasks array directly (O(M*N)) vs creating Set (O(N)).
+      // Since M (pending deletes) is usually very small (0-2), this is faster and saves memory allocation.
       prev.forEach((id) => {
-        if (taskIds.has(id)) {
+        if (tasks.some((t) => t.id === id)) {
           next.add(id);
         }
       });
