@@ -3,7 +3,6 @@
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { updateTask } from "@/server/tasks";
-import { getLabels } from "@/server/labels";
 import { TaskDto, LabelDto, Status, Priority } from "@/types";
 import {
   Sheet,
@@ -44,15 +43,16 @@ import { format } from "date-fns";
 
 interface TaskEditSheetProps {
   task: TaskDto | null;
+  initialLabels?: LabelDto[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave?: () => void;
 }
 
-export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditSheetProps) {
+export function TaskEditSheet({ task, initialLabels = [], open, onOpenChange, onSave }: TaskEditSheetProps) {
   const router = useRouter();
   const [savingField, setSavingField] = useState<string | null>(null);
-  const [availableLabels, setAvailableLabels] = useState<LabelDto[]>([]);
+  const [availableLabels, setAvailableLabels] = useState<LabelDto[]>(initialLabels);
   const [labelsOpen, setLabelsOpen] = useState(false);
 
   const form = useForm({
@@ -66,20 +66,14 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
     },
   });
 
-  // Fetch available labels on mount
+  // Sync available labels with prefetched labels from props
   useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        const labels = await getLabels();
-        setAvailableLabels(labels);
-      } catch (error) {
-        console.error("Failed to fetch labels:", error);
-      }
-    };
-    fetchLabels();
-  }, []);
+    setAvailableLabels(initialLabels);
+  }, [initialLabels]);
 
   // Reset form when task changes
+  // Performance optimization: only reset when the task ID changes, to avoid
+  // overwriting local state during auto-save revalidations (router.refresh).
   useEffect(() => {
     if (task) {
       form.setFieldValue("title", task.title);
@@ -89,7 +83,7 @@ export function TaskEditSheet({ task, open, onOpenChange, onSave }: TaskEditShee
       form.setFieldValue("dueDate", task.dueDate || null);
       form.setFieldValue("labelIds", task.labels?.map((l) => l.id) || []);
     }
-  }, [task?.id]);
+  }, [task?.id, form]);
 
   const handleAutoSave = useCallback(
     async (fieldName: string, value: string | Date | null | string[] | Status | Priority) => {
