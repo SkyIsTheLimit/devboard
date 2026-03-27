@@ -1,0 +1,60 @@
+
+> @devboard-interactive/web@0.1.0 dev
+> next dev
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Experiments (use with caution):
+  · clientTraceMetadata
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 5.3s
+[31m[auth][error][0m MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+    at assertConfig (/app/packages/web/.next/dev/server/chunks/97170_@auth_core_3812ce2c._.js:640:16)
+    at Auth (/app/packages/web/.next/dev/server/chunks/97170_@auth_core_3812ce2c._.js:5457:234)
+○ Compiling / ...
+[31m[auth][error][0m MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+    at assertConfig (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:640:16)
+    at Auth (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:5457:234)
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at listOnTimeout (node:internal/timers:547:9)
+    at process.processTimers (node:internal/timers:521:7)
+[31m[auth][error][0m MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+    at assertConfig (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:640:16)
+    at Auth (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:5457:234)
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at listOnTimeout (node:internal/timers:547:9)
+    at process.processTimers (node:internal/timers:521:7)
+[31m[auth][error][0m MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+    at assertConfig (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:640:16)
+    at Auth (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:5457:234)
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at listOnTimeout (node:internal/timers:547:9)
+    at process.processTimers (node:internal/timers:521:7)
+[31m[auth][error][0m MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+    at assertConfig (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:640:16)
+    at Auth (/app/packages/web/.next/dev/server/chunks/ssr/97170_@auth_core_c69028d4._.js:5457:234)
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at listOnTimeout (node:internal/timers:547:9)
+    at process.processTimers (node:internal/timers:521:7)
+⨯ TypeError: Cannot read properties of undefined (reading 'id')
+    at <unknown> (src/server/with-auth.ts:21:30)
+    at async Home (src/app/(main)/page.tsx:23:27)
+  19 |     return handler(
+  20 |       {
+> 21 |         userId: session.user.id,
+     |                              ^
+  22 |         user: session.user,
+  23 |         expires: session.expires,
+  24 |       }, {
+  digest: '333516171'
+}
+ HEAD / 500 in 15.3s (compile: 13.5s, proxy.ts: 550ms, render: 1324ms)
