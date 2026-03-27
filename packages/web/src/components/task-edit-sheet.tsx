@@ -99,7 +99,7 @@ export function TaskEditSheet({ task, initialLabels = [], open, onOpenChange, on
       form.setFieldValue("dueDate", task.dueDate || null);
       form.setFieldValue("labelIds", task.labels?.map((l) => l.id) || []);
     }
-  }, [task?.id, form]);
+  }, [task?.id, task, form]);
 
   const handleAutoSave = useCallback(
     async (fieldName: string, value: string | Date | null | string[] | Status | Priority) => {
