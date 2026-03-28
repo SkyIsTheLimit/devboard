@@ -1,0 +1,7 @@
+## 2026-03-28 - Eliminate Client-Side Waterfalls with Server Prefetching
+**Learning:** In Next.js applications with dynamically imported client components (like `TaskEditSheet`), a significant performance bottleneck occurs when those components trigger their own `useEffect` data fetches upon mounting. This creates a sequential waterfall: (1) Main page loads, (2) User interaction triggers dynamic import, (3) Component loads, (4) Component mounts and starts fetch, (5) Data returns.
+**Action:** Always prefetch secondary data (like labels, categories, or user preferences) in the parent Server Component alongside the primary data using `Promise.all`. Pass this data down as `initialData` props to eliminate the client-side fetch entirely, ensuring the UI is ready immediately upon component mount.
+
+## 2026-03-28 - Optimized List Membership Checks in React
+**Learning:** Using `.includes()` inside a `.filter()` or `.map()` over a list of items based on another array (e.g., filtering selected labels) results in O(N*M) time complexity. While negligible for small lists, it's a suboptimal pattern that can scale poorly.
+**Action:** Precompute a `Set` from the lookup array before the loop. This reduces membership checks to O(1), resulting in O(N+M) total complexity for the render pass. Note: In this codebase, since `form.Field` render callbacks don't allow hooks, the `Set` must be constructed directly within the render logic.
