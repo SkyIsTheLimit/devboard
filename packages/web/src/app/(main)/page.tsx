@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { parseSearchForStatus } from "@/components/filter-status";
 import { redirect } from "next/navigation";
 import { getTasks } from "@/server/tasks";
+import { getLabels } from "@/server/labels";
 import { TaskPageWrapper } from "@/components/task-page-wrapper";
 import { Filter } from "@/components/filter";
 import { searchList } from "@/components/filter-status";
@@ -17,11 +18,17 @@ export default async function Home({
   if (!session) redirect("/signin");
 
   const searchItem = parseSearchForStatus(searchParams.status?.toString());
-  const tasks = await getTasks(searchItem.status);
+
+  // Prefetch tasks and labels in parallel to eliminate waterfalls
+  const [tasks, initialLabels] = await Promise.all([
+    getTasks(searchItem.status),
+    getLabels(),
+  ]);
 
   return (
     <TaskPageWrapper
       tasks={tasks}
+      initialLabels={initialLabels}
       user={session.user}
       filter={<Filter activeItem={searchItem} searchList={searchList} />}
     />
