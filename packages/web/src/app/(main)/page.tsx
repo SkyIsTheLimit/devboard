@@ -26,11 +26,9 @@ export default async function Home({
   ]);
 
   return (
-    <TaskPageWrapper
-      tasks={tasks}
-      initialLabels={initialLabels}
-      user={session.user}
-      filter={<Filter activeItem={searchItem} searchList={searchList} />}
-    />
+    <>
+      <Filter activeItem={searchItem} searchList={searchList} />
+      <TaskPageWrapper tasks={tasks} initialLabels={initialLabels} />
+    </>
   );
 }

@@ -106,7 +106,10 @@ export function TaskEditSheet({
   }, [task?.id]);
 
   const handleAutoSave = useCallback(
-    async (fieldName: string, value: string | Date | null | string[] | Status | Priority) => {
+    async (
+      fieldName: string,
+      value: string | Date | null | string[] | Status | Priority,
+    ) => {
       if (!task) return;
 
       setSavingField(fieldName);
@@ -142,19 +145,10 @@ export function TaskEditSheet({
 
         router.refresh();
         onSave?.();
-
-        // Show subtle success feedback
-        const fieldLabels: Record<string, string> = {
-          title: "Title",
-          description: "Description",
-          status: "Status",
-          priority: "Priority",
-          dueDate: "Due date",
-          labelIds: "Labels",
-        };
-        // toast.success(`${fieldLabels[fieldName]} updated`);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : `Failed to update ${fieldName}`);
+        toast.error(
+          error instanceof Error ? error.message : `Failed to update ${fieldName}`,
+        );
       } finally {
         setSavingField(null);
       }
