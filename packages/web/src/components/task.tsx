@@ -42,17 +42,17 @@ export const Task = memo(function Task({
     }
   }, [onEdit, task]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (onDelete) {
       onDelete(task);
     }
-  };
+  }, [onDelete, task]);
 
-  const handleClone = () => {
+  const handleClone = useCallback(() => {
     if (onClone) {
       onClone(task);
     }
-  };
+  }, [onClone, task]);
 
   return (
     <Item
