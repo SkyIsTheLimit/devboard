@@ -1,0 +1,3 @@
+## 2026-04-01 - Prefetching Labels to Eliminate Waterfalls
+**Learning:** In Next.js applications using Client Components for modals/sheets (like `TaskEditSheet`), fetching metadata (like available labels) inside the component's `useEffect` causes a UI waterfall. Hoisting this fetch to the Server Component and passing it down as props allows for parallel fetching on the server and immediate availability on the client.
+**Action:** Always check if metadata used in client-side forms can be prefetched in the parent Server Component and passed down, especially for components that are dynamically imported or conditionally rendered.
