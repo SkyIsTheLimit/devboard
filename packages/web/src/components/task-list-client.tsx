@@ -58,6 +58,9 @@ export function TasksListClient({
   useEffect(() => {
     // Remove pending deletes for tasks that no longer exist in props (already deleted)
     setPendingDeletes((prev) => {
+      // Optimization: Early return for common case to avoid Set creation
+      if (prev.size === 0) return prev;
+
       const taskIds = new Set(tasks.map((t) => t.id));
       const next = new Set<string>();
       prev.forEach((id) => {
