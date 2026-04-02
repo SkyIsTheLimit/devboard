@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,66 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+// Custom comparison to handle Next.js Server Components passing newly serialized
+// object references on every render, invalidating standard React.memo.
+function areTaskPropsEqual(prev: TaskProps, next: TaskProps) {
+  // Shallow comparison of all non-task props to prevent stale closures
+  for (const key in prev) {
+    if (key !== "task" && prev[key as keyof TaskProps] !== next[key as keyof TaskProps]) {
+      return false;
+    }
+  }
+  for (const key in next) {
+    if (key !== "task" && !(key in prev)) {
+      return false;
+    }
+  }
+
+  // Fast path reference check for the task object
+  if (prev.task === next.task) return true;
+
+  const pt = prev.task;
+  const nt = next.task;
+
+  // Explicit comparison of visible task fields dynamically
+  const keys = new Set([...Object.keys(pt), ...Object.keys(nt)]) as Set<keyof TaskModel>;
+
+  for (const key of keys) {
+    // Avoid relying on updatedAt to ensure UI consistency during optimistic updates
+    if (key === "updatedAt" || key === "createdAt") continue;
+
+    if (key === "dueDate") {
+      // Handle Date and string representations safely
+      const prevDueDate = pt.dueDate ? new Date(pt.dueDate).getTime() : null;
+      const nextDueDate = nt.dueDate ? new Date(nt.dueDate).getTime() : null;
+      if (prevDueDate !== nextDueDate) return false;
+      continue;
+    }
+
+    if (key === "labels") {
+      // Deep comparison of labels
+      const prevLabels = pt.labels || [];
+      const nextLabels = nt.labels || [];
+      if (prevLabels.length !== nextLabels.length) return false;
+
+      for (let i = 0; i < prevLabels.length; i++) {
+        const pl = prevLabels[i];
+        const nl = nextLabels[i];
+        if (pl.id !== nl.id || pl.name !== nl.name || pl.color !== nl.color) {
+          return false;
+        }
+      }
+      continue;
+    }
+
+    if (pt[key] !== nt[key]) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +175,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
