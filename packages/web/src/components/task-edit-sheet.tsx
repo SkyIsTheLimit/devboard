@@ -335,8 +335,12 @@ export function TaskEditSheet({
 
           <form.Field name="labelIds">
             {(field) => {
+              // ⚡ Bolt Optimization: Precompute a Set from the selected label IDs
+              // to achieve O(1) membership lookups. This reduces the time complexity
+              // of filtering and mapping labels from O(N*M) to O(N+M).
+              const selectedLabelIdsSet = new Set(field.state.value);
               const selectedLabels = availableLabels.filter((label) =>
-                field.state.value.includes(label.id)
+                selectedLabelIdsSet.has(label.id)
               );
 
               return (
@@ -383,7 +387,7 @@ export function TaskEditSheet({
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = field.state.value.includes(label.id);
+                              const isSelected = selectedLabelIdsSet.has(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
