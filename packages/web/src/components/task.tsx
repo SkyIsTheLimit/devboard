@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,62 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+// IMPORTANT: This comparison function must be updated if new props are added to Task component
+// or if the TaskDto structure changes significantly.
+function areTaskPropsEqual(prevProps: TaskProps, nextProps: TaskProps) {
+  // Check if unstable props changed (e.g. function references, though we expect them to be stable)
+  if (
+    prevProps.onEdit !== nextProps.onEdit ||
+    prevProps.onDelete !== nextProps.onDelete ||
+    prevProps.onClone !== nextProps.onClone ||
+    prevProps.isPending !== nextProps.isPending
+  ) {
+    return false;
+  }
+
+  const prevTask = prevProps.task;
+  const nextTask = nextProps.task;
+
+  // Check primitives and simple fields
+  if (
+    prevTask.id !== nextTask.id ||
+    prevTask.title !== nextTask.title ||
+    prevTask.description !== nextTask.description ||
+    prevTask.status !== nextTask.status ||
+    prevTask.priority !== nextTask.priority
+  ) {
+    return false;
+  }
+
+  // Check dates (handle potential string vs Date differences safely)
+  const prevUpdated = new Date(prevTask.updatedAt).getTime();
+  const nextUpdated = new Date(nextTask.updatedAt).getTime();
+  if (prevUpdated !== nextUpdated) return false;
+
+  const prevCreated = new Date(prevTask.createdAt).getTime();
+  const nextCreated = new Date(nextTask.createdAt).getTime();
+  if (prevCreated !== nextCreated) return false;
+
+  // Check labels
+  if (prevTask.labels.length !== nextTask.labels.length) {
+    return false;
+  }
+
+  for (let i = 0; i < prevTask.labels.length; i++) {
+    const prevLabel = prevTask.labels[i];
+    const nextLabel = nextTask.labels[i];
+    if (
+      prevLabel.id !== nextLabel.id ||
+      prevLabel.name !== nextLabel.name ||
+      prevLabel.color !== nextLabel.color
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +171,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
