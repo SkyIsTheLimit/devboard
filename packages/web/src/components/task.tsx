@@ -9,7 +9,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@devboard-interactive/ui/item";
-import { Status, TaskDto as TaskModel } from "@/types";
+import { TaskDto as TaskModel } from "@/types";
 
 import { Button } from "@devboard-interactive/ui/button";
 import { TaskLabels } from "./labels";
@@ -25,6 +25,26 @@ export type TaskProps = {
 
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+function arePropsEqual(prev: TaskProps, next: TaskProps) {
+  const { task: prevTask, ...prevRest } = prev;
+  const { task: nextTask, ...nextRest } = next;
+
+  // Deep compare task using JSON stringify (handles Dates as ISO strings)
+  if (JSON.stringify(prevTask) !== JSON.stringify(nextTask)) return false;
+
+  // Shallow compare rest
+  const prevKeys = Object.keys(prevRest) as (keyof typeof prevRest)[];
+  const nextKeys = Object.keys(nextRest) as (keyof typeof nextRest)[];
+
+  if (prevKeys.length !== nextKeys.length) return false;
+
+  for (const key of prevKeys) {
+    if (prevRest[key] !== nextRest[key]) return false;
+  }
+
+  return true;
+}
 
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
@@ -115,4 +135,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, arePropsEqual);
