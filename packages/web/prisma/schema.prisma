@@ -28,7 +28,7 @@ model Task {
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
+  @@index([userId, deletedAt, status])
   @@index([deletedAt])
 }
 
