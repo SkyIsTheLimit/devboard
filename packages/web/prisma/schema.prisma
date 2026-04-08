@@ -28,8 +28,10 @@ model Task {
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([deletedAt])
+  // ⚡ Bolt: Composite index covers the most frequent getTasks query pattern (filtering by userId, deletedAt, and optionally status).
+  // The standalone userId index is omitted as it acts as the leftmost prefix.
+  @@index([userId, deletedAt, status])
+  @@index([deletedAt]) // Retained for any potential global queries filtering only by deletedAt
 }
 
 model Label {
