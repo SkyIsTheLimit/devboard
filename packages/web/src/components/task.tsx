@@ -26,6 +26,45 @@ export type TaskProps = {
 const capitalize = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+function areTaskPropsEqual(prevProps: TaskProps, nextProps: TaskProps) {
+  const { task: prevTask, ...prevRest } = prevProps;
+  const { task: nextTask, ...nextRest } = nextProps;
+
+  // 1. Shallow compare non-task props (handlers, isPending, etc.)
+  const prevKeys = Object.keys(prevRest);
+  const nextKeys = Object.keys(nextRest);
+  if (prevKeys.length !== nextKeys.length) return false;
+
+  for (const key of prevKeys) {
+    if (
+      prevRest[key as keyof typeof prevRest] !==
+      nextRest[key as keyof typeof nextRest]
+    ) {
+      return false;
+    }
+  }
+
+  // 2. Compare Task Identity and Version
+  if (prevTask.id !== nextTask.id) return false;
+  if (
+    new Date(prevTask.updatedAt).getTime() !==
+    new Date(nextTask.updatedAt).getTime()
+  )
+    return false;
+
+  // 3. Compare Labels (Edge case: Label renaming doesn't touch Task updatedAt)
+  if (prevTask.labels.length !== nextTask.labels.length) return false;
+  for (let i = 0; i < prevTask.labels.length; i++) {
+    const p = prevTask.labels[i];
+    const n = nextTask.labels[i];
+    if (p.id !== n.id || p.name !== n.name || p.color !== n.color) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 // Memoized to prevent re-renders when parent state (like optimistic deletes) changes
 // but this specific task hasn't changed.
 export const Task = memo(function Task({
@@ -115,4 +154,4 @@ export const Task = memo(function Task({
       </ItemActions>
     </Item>
   );
-});
+}, areTaskPropsEqual);
