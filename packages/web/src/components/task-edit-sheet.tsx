@@ -335,8 +335,11 @@ export function TaskEditSheet({
 
           <form.Field name="labelIds">
             {(field) => {
+              // ⚡ Bolt: Optimize O(N*M) membership checks by precomputing a Set for O(1) lookups
+              // When the number of available and selected labels is large, `.includes()` is inefficient.
+              const selectedLabelIdsSet = new Set(field.state.value);
               const selectedLabels = availableLabels.filter((label) =>
-                field.state.value.includes(label.id)
+                selectedLabelIdsSet.has(label.id)
               );
 
               return (
@@ -383,7 +386,7 @@ export function TaskEditSheet({
                           <CommandEmpty>No labels found.</CommandEmpty>
                           <CommandGroup>
                             {availableLabels.map((label) => {
-                              const isSelected = field.state.value.includes(label.id);
+                              const isSelected = selectedLabelIdsSet.has(label.id);
                               return (
                                 <CommandItem
                                   key={label.id}
